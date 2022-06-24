@@ -1,0 +1,8 @@
+{
+  discordBotToken: '',
+  updateIntervalSeconds: 30,
+  watch1GigModel: true,
+  watch2GigModel: true,
+  watch4GigModel: true,
+  watch8GigModel: true,
+}
