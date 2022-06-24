@@ -1,3 +1,9 @@
+
+# 🚧 🛑 STOP! THIS IS WORK IN PROGRESS! 🛑 🚧
+### **This bot is NOT done and still in active development. All or parts of it will not be functional during this stage. A release will be published as soon as it's ready for use :)**
+<br>
+<br>
+
 # Adafruit-Pi4-Stock-Bot
 A simple Discord bot that that checks the stock status of all the Raspberry Pi 4 models on Adafruit and sends a message to a Discord channel when one is in stock.
 
