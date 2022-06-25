@@ -33,7 +33,7 @@ function checkStockStatus() {
       // send the stock status to discord if any of the models are in stock
       if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
         // report what is in stock
-        console.log(chalk.green(`These models are in STOCK: ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
+        console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
         sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
       }
     })
@@ -44,6 +44,7 @@ function checkStockStatus() {
 
 // schedule the stock status update to be called at the specified interval
 setInterval(() => { checkStockStatus(); }, config.updateIntervalSeconds * 1000);
+
 
 
 //**********************************
@@ -112,6 +113,7 @@ function setupServer() {
 }
 
 
+//* this function does the job of verifying the severs channels and roles, then sending the actual notification messages to discord
 function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
 
   let mentionRolesMessage = ''; // will be populated with the roles to mention based on status of each model
@@ -138,24 +140,22 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
   if (oneGigModelInStock && config.watch1GigModel) {
     embed.addField('1GB Model', '[BUY IT!](https://www.adafruit.com/product/4295)', true);
     const oneGigRole = rolesCache.find(role => role.name === 'Pi4 1GB');
-    mentionRolesMessage += (oneGigRole) ? ` <@!${oneGigRole.id}}> ` : console.error(chalk.red('No 1GB role found!'));
+    mentionRolesMessage += (oneGigRole) ? ` ${oneGigRole.id} ` : console.error(chalk.red('No 1GB role found!'));
   }
   if (twoGigModelInStock && config.watch2GigModel) {
     embed.addField('2GB Model', '[BUY IT!](https://www.adafruit.com/product/4292)', true);
     const twoGigRole = rolesCache.find(role => role.name === 'Pi4 2GB');
-    console.log('no', twoGigRole);
-    mentionRolesMessage += (twoGigRole) ? ` <@!${twoGigRole.id}}> ` : console.error(chalk.red('No 2GB role found!'));
+    mentionRolesMessage += (twoGigRole) ? ` ${twoGigRole.id} ` : console.error(chalk.red('No 2GB role found!'));
   }
   if (fourGigModelInStock && config.watch4GigModel) {
     embed.addField('4GB Model', '[BUY IT!](https://www.adafruit.com/product/4296)', true);
     const fourGigRole = rolesCache.find(role => role.name === 'Pi4 4GB');
-    mentionRolesMessage += (fourGigRole) ? ` <@!${fourGigRole}}> ` : console.error(chalk.red('No 4GB role found!'));
+    mentionRolesMessage += (fourGigRole) ? ` ${fourGigRole} ` : console.error(chalk.red('No 4GB role found!'));
   }
   if (eightGigModelInStock && config.watch8GigModel) {
     embed.addField('8GB Model', '[BUY IT!](https://www.adafruit.com/product/4564)', true);
     const eightGigRole = rolesCache.find(role => role.name === 'Pi4 8GB');
-    console.log('no', eightGigRole);
-    mentionRolesMessage += (eightGigRole) ? ` <@!${eightGigRole}}> ` : console.error(chalk.red('No 8GB role found!'));
+    mentionRolesMessage += (eightGigRole) ? ` ${eightGigRole} ` : console.error(chalk.red('No 8GB role found!'));
   }
 
   // lookup the configured discord TEXT channel by name and send the embed out to the channel
@@ -172,7 +172,7 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
       });
 
     // also mention all the relevant users that have the applicable model roles (if the roles could be found in the server)
-    if (mentionRolesMessage) {
+    if (mentionRolesMessage && mentionRolesMessage !== '' && mentionRolesMessage !== 'undefined' && typeof mentionRolesMessage !== 'undefined') {
       channel.send(mentionRolesMessage.trim())
         .then(() => {
           console.log(chalk.greenBright('Successfully sent MENTION message to Discord!'));
@@ -183,6 +183,6 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
     }
   }
   else {
-    console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discordChannelName + '"')), chalk.yellow('check config file! (verify CaSe and spelling)'));
+    console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discordChannelName + '"')), chalk.yellow('Did you delete it? Can I see it? Check your config!'));
   }
 }
