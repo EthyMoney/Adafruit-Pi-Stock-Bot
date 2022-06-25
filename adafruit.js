@@ -1,55 +1,72 @@
-const axios = require('axios').default;
-const jsdom = require('jsdom');
-const chalk = require('chalk');
-const fs = require('fs');
-const { JSDOM } = jsdom;
+/*
+ * ------------------------------------------------------------------------
+ *
+ *      _____ _ _  _      _____ _             _       ____        _   
+ *     |  __ (_| || |    / ____| |           | |     |  _ \      | |  
+ *     | |__) _| || |_  | (___ | |_ ___   ___| | __  | |_) | ___ | |_ 
+ *     |  ___| |__   _|  \___ \| __/ _ \ / __| |/ /  |  _ < / _ \| __|
+ *     | |   | |  | |    ____) | || (_) | (__|   <   | |_) | (_) | |_ 
+ *     |_|   |_|  |_|   |_____/ \__\___/ \___|_|\_\  |____/ \___/ \__|
+ *
+ *
+ *
+ * Author:      Logan S. ~ EthyMoney#5000(Discord) ~ EthyMoney(GitHub)
+ * Program:     Adafruit Pi4 Stock Bot
+ * GitHub:      https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot
+ *
+ * Discord and Slack bot that sends alerts of stock of the Raspberry Pi 4 on Adafruit.com
+ *
+ * No parameters on start. Ensure config.json is configured correctly prior to running.
+ *
+ * If you find this helpful, consider donating to show support :)
+ * ETH address: 0x169381506870283cbABC52034E4ECc123f3FAD02
+ *
+ *
+ *                        Hello from Minnesota USA!
+ *                              ⋆⁺₊⋆ ☾ ⋆⁺₊⋆
+ *
+ * ------------------------------------------------------------------------
+*/
+
+
+
+// -------------------------------------------
+// -------------------------------------------
+//
+//           SETUP AND DECLARATIONS
+//
+// -------------------------------------------
+// -------------------------------------------
+
 const { MessageEmbed, Client, Intents, ShardClientUtil } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES], shards: 'auto' });
-const clientShardHelper = new ShardClientUtil(client);
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-let configuredGuild; // the discord guild to send the stock status to (gets initialized in the ready event)
+const client               = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES], shards: 'auto' });
+const axios                = require('axios').default;
+const jsdom                = require('jsdom');
+const chalk                = require('chalk');
+const fs                   = require('fs');
+const { JSDOM }            = jsdom;
+const clientShardHelper    = new ShardClientUtil(client);
+const config               = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
 // connect to discord
 client.login(config.discordBotToken);
-
-
-// query the Adafruit website for the stock stats of all models of the Raspberry Pi 4 Model B
-function checkStockStatus() {
-  axios.get('https://www.adafruit.com/product/4295')
-    .then(function (response) {
-      // on success, parse the HTML response into a DOM object
-      const html = response.data;
-      const dom = new JSDOM(html);
-
-      // get all the of the HTML list elements that contain the stock status for each model
-      const stockList = dom.window.document.querySelector('div.mobile-button-row:nth-child(1) > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
-
-      // gather the stock status of each model (represented as a boolean for being in-stock or not)
-      const oneGigModelInStock = stockList[0].textContent.includes('In stock');
-      const twoGigModelInStock = stockList[1].textContent.includes('In stock');
-      const fourGigModelInStock = true; //stockList[2].textContent.includes('In stock');
-      const eightGigModelInStock = stockList[3].textContent.includes('In stock');
-
-      // send the stock status to discord if any of the models are in stock
-      if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
-        // report what is in stock
-        console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
-        sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
-      }
-    })
-    .catch(function (error) {
-      console.error(chalk.red('An error occurred during the status refresh:\n'), error);
-    });
-}
 
 // schedule the stock status update to be called at the specified interval
 setInterval(() => { checkStockStatus(); }, config.updateIntervalSeconds * 1000);
 
 
 
-//**********************************
-//*     Discord Event Handlers     *
-//**********************************
+// -------------------------------------------
+// -------------------------------------------
+//
+//          DISCORD EVENT HANDLERS
+//
+// -------------------------------------------
+// -------------------------------------------
+
+// runs once the discord bot has logged in and is ready to send messages
+// this is when we want to do our discord setup tasks and make our first stock status check
 
 client.on('ready', () => {
   console.log(chalk.greenBright(`Logged in as ${client.user.tag} in ${client.guilds.cache.size} servers while using ${clientShardHelper.count} shard(s)!`));
@@ -70,59 +87,55 @@ client.on('ready', () => {
 
 
 
-//**********************************
-//*       Utility Functions        *
-//**********************************
+// -------------------------------------------
+// -------------------------------------------
+//
+//              CORE FUNCTIONS
+//
+// -------------------------------------------
+// -------------------------------------------
 
-// function that runs on startup to set up the configured discord server with the necessary roles and notification channel
-function setupServer() {
-  // first, create the roles roles for the server if they don't exist yet (in RGB cus we're real gamers here)
-  const roles = [
-    { name: 'Pi4 1GB', color: 'RED' },
-    { name: 'Pi4 2GB', color: 'GREEN' },
-    { name: 'Pi4 4GB', color: 'BLUE' },
-    { name: 'Pi4 8GB', color: 'PURPLE' },
-  ];
-  roles.forEach(role => {
-    if (!configuredGuild.roles.cache.find(r => r.name == role.name)) {
-      configuredGuild.roles.create({ name: role.name, color: role.color })
-        .then(role => {
-          console.log(chalk.green(`Created role: ${role.name}`));
-        })
-        .catch(err => {
-          console.error(chalk.red(`Error creating role: ${role.name}\n:`), err);
-        });
-    }
-  });
-  // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
-  if (!configuredGuild.channels.cache.find(c => c.name == config.discordChannelName)) {
-    configuredGuild.channels.create({ data: { name: 'pi4-stock-notifications' } })
-      .then(channel => {
-        // set the notification channel in the config to be this new one (so it can be used in the future)
-        config.discordChannelName = 'pi4-stock-notifications';
-        fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
-        console.log(chalk.green(`You didn't provide a channel name or it wasn't able to be found in the server, so I created and set a new default notification channel for you: ${channel.name}`));
-      })
-      .catch(err => {
-        console.error(
-          chalk.red('Error creating default notification channel, either set the correct one in your config or correct what is preventing me from doing it (likely a permissions issue)\n'), err);
-      });
-  }
-  console.log(chalk.greenBright(`Discord server setup complete for ${chalk.cyan(configuredGuild.name)}  Lets go! ⚡⚡⚡`));
-  console.log(chalk.green('\nI\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.updateIntervalSeconds) + ' seconds...\n'));
+// function to query the Adafruit website for the stock stats of all models of the Raspberry Pi 4 Model B
+
+function checkStockStatus() {
+  axios.get('https://www.adafruit.com/product/4295')
+    .then(function (response) {
+      // on success, parse the HTML response into a DOM object
+      const html = response.data;
+      const dom = new JSDOM(html);
+
+      // get all the of the HTML list elements that contain the stock status for each model
+      const stockList = dom.window.document.querySelector('div.mobile-button-row:nth-child(1) > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
+
+      // gather the stock status of each model (represented as a boolean for being in-stock or not)
+      const oneGigModelInStock = stockList[0].textContent.includes('In stock');
+      const twoGigModelInStock = stockList[1].textContent.includes('In stock');
+      const fourGigModelInStock = stockList[2].textContent.includes('In stock');
+      const eightGigModelInStock = stockList[3].textContent.includes('In stock');
+
+      // send the stock status to discord if any of the models are in stock
+      if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
+        // report what is in stock
+        console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
+        sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
+      }
+    })
+    .catch(function (error) {
+      console.error(chalk.red('An error occurred during the status refresh:\n'), error);
+    });
 }
 
 
-//* this function does the job of verifying the severs channels and roles, then sending the actual notification messages to discord
+//------------------------------------------
+//------------------------------------------
+
+// this function does the job of verifying the severs channels and roles, then sending the actual notification messages to discord
+
 function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
-
-  let mentionRolesMessage = ''; // will be populated with the roles to mention based on status of each model
   console.log(chalk.greenBright('Sending stock status to Discord...'));
-
-  // grab the roles cache from the configured guild
+  let mentionRolesMessage = ''; // will be populated with the roles to mention based on status of each model
+  // grab the roles and channels cache from the configured guild
   const rolesCache = configuredGuild.roles.cache;
-
-  // grab the channels cache from the configured guild
   const channelsCache = configuredGuild.channels.cache;
 
   // create the template embed to send to discord
@@ -186,3 +199,55 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
     console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discordChannelName + '"')), chalk.yellow('Did you delete it? Can I see it? Check your config!'));
   }
 }
+
+
+
+// -------------------------------------------
+// -------------------------------------------
+//
+//             UTILITY FUNCTIONS
+//
+// -------------------------------------------
+// -------------------------------------------
+
+// function that runs on startup to set up the configured discord server with the necessary roles and notification channel
+
+function setupServer() {
+  // first, create the roles roles for the server if they don't exist yet (in RGB cus we're real gamers here)
+  const roles = [
+    { name: 'Pi4 1GB', color: 'RED' },
+    { name: 'Pi4 2GB', color: 'GREEN' },
+    { name: 'Pi4 4GB', color: 'BLUE' },
+    { name: 'Pi4 8GB', color: 'PURPLE' },
+  ];
+  roles.forEach(role => {
+    if (!configuredGuild.roles.cache.find(r => r.name == role.name)) {
+      configuredGuild.roles.create({ name: role.name, color: role.color })
+        .then(role => {
+          console.log(chalk.green(`Created role: ${role.name}`));
+        })
+        .catch(err => {
+          console.error(chalk.red(`Error creating role: ${role.name}\n:`), err);
+        });
+    }
+  });
+  // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
+  if (!configuredGuild.channels.cache.find(c => c.name == config.discordChannelName)) {
+    configuredGuild.channels.create({ data: { name: 'pi4-stock-notifications' } })
+      .then(channel => {
+        // set the notification channel in the config to be this new one (so it can be used in the future)
+        config.discordChannelName = 'pi4-stock-notifications';
+        fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
+        console.log(chalk.green(`You didn't provide a channel name or it wasn't able to be found in the server, so I created and set a new default notification channel for you: ${channel.name}`));
+      })
+      .catch(err => {
+        console.error(
+          chalk.red('Error creating default notification channel, either set the correct one in your config or correct what is preventing me from doing it (likely a permissions issue)\n'), err);
+      });
+  }
+  console.log(chalk.greenBright(`Discord server setup complete for ${chalk.cyan(configuredGuild.name)}  Lets go! ⚡⚡⚡`));
+  console.log(chalk.green('\nI\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.updateIntervalSeconds) + ' seconds...\n'));
+}
+
+
+// welcome to the end, want a cookie?  ༼ つ ◕_◕ ༽つ🍪
