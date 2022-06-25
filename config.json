@@ -1,6 +1,7 @@
 {
   "discordBotToken": "",
-  "channelNameToSendUpdatesTo": "",
+  "discordServerID": "",
+  "discordChannelName": "",
   "updateIntervalSeconds": 30,
   "watch1GigModel": true,
   "watch2GigModel": true,
