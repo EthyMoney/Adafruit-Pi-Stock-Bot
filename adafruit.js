@@ -61,14 +61,10 @@ client.on('ready', () => {
   catch (err) {
     console.error(chalk.red(`Error looking up guild with provided ID ${config.discordServerID}\n:`), err);
   }
+  // verify and set up the configured discord server if it's not already set up
+  setupServer();
   // run a stock status check on startup (will run on configured interval after this)
   checkStockStatus();
-});
-
-// Logs additions of new servers
-client.on('guildCreate', guild => {
-  console.log(chalk.green('NEW SERVER: ' + chalk.cyan(guild.name)));
-  //setupServer(guild);
 });
 
 
@@ -77,12 +73,43 @@ client.on('guildCreate', guild => {
 //*       Utility Functions        *
 //**********************************
 
-// function setupServer() {
-//   // first, create the roles roles for the server
-//   createRoles();
-//   // create the notification channel
-//   createNotificationChannel();
-// }
+// function that runs on startup to set up the configured discord server with the necessary roles and notification channel
+function setupServer() {
+  // first, create the roles roles for the server if they don't exist yet (in RGB cus we're real gamers here)
+  const roles = [
+    { name: 'Pi4 1GB', color: 'RED' },
+    { name: 'Pi4 2GB', color: 'GREEN' },
+    { name: 'Pi4 4GB', color: 'BLUE' },
+    { name: 'Pi4 8GB', color: 'PURPLE' },
+  ];
+  roles.forEach(role => {
+    if (!configuredGuild.roles.cache.find(r => r.name == role.name)) {
+      configuredGuild.roles.create({ name: role.name, color: role.color })
+        .then(role => {
+          console.log(chalk.green(`Created role: ${role.name}`));
+        })
+        .catch(err => {
+          console.error(chalk.red(`Error creating role: ${role.name}\n:`), err);
+        });
+    }
+  });
+  // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
+  if (!configuredGuild.channels.cache.find(c => c.name == config.discordChannelName)) {
+    configuredGuild.channels.create({ data: { name: 'pi4-stock-notifications' } })
+      .then(channel => {
+        // set the notification channel in the config to be this new one (so it can be used in the future)
+        config.discordChannelName = 'pi4-stock-notifications';
+        fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
+        console.log(chalk.green(`You didn't provide a channel name or it wasn't able to be found in the server, so I created and set a new default notification channel for you: ${channel.name}`));
+      })
+      .catch(err => {
+        console.error(
+          chalk.red('Error creating default notification channel, either set the correct one in your config or correct what is preventing me from doing it (likely a permissions issue)\n'), err);
+      });
+  }
+  console.log(chalk.greenBright(`Discord server setup complete for ${chalk.cyan(configuredGuild.name)}  Lets go! ⚡⚡⚡`));
+  console.log(chalk.green('\nI\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.updateIntervalSeconds) + ' seconds...\n'));
+}
 
 
 function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
