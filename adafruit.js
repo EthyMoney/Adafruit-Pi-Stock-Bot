@@ -49,6 +49,12 @@ const clientShardHelper    = new ShardClientUtil(client);
 const config               = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
+// flags indicating current stock status of each model (used to prevent sending the same in-stock messages multiple times)
+let oneGigActive = false;
+let twoGigActive = false;
+let fourGigActive = false;
+let eightGigActive = false;
+
 // connect to discord
 client.login(config.discordBotToken);
 
@@ -108,10 +114,18 @@ function checkStockStatus() {
       const stockList = dom.window.document.querySelector('div.mobile-button-row:nth-child(1) > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
 
       // gather the stock status of each model (represented as a boolean for being in-stock or not)
-      const oneGigModelInStock = stockList[0].textContent.includes('In stock');
-      const twoGigModelInStock = stockList[1].textContent.includes('In stock');
-      const fourGigModelInStock = stockList[2].textContent.includes('In stock');
-      const eightGigModelInStock = stockList[3].textContent.includes('In stock');
+      let oneGigModelInStock = stockList[0].textContent.includes('In stock');
+      let twoGigModelInStock = stockList[1].textContent.includes('In stock');
+      let fourGigModelInStock = stockList[2].textContent.includes('In stock');
+      let eightGigModelInStock = stockList[3].textContent.includes('In stock');
+
+      // verify that the stock status of each model has changed since the last check and update flags
+      checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, (adjustedOneGig, adjustedTwoGig, adjustedFourGig, adjustedEightGig) => {
+        oneGigModelInStock = adjustedOneGig;
+        twoGigModelInStock = adjustedTwoGig;
+        fourGigModelInStock = adjustedFourGig;
+        eightGigModelInStock = adjustedEightGig;
+      });
 
       // send the stock status to discord if any of the models are in stock
       if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
@@ -247,6 +261,65 @@ function setupServer() {
   }
   console.log(chalk.greenBright(`Discord server setup complete for ${chalk.cyan(configuredGuild.name)}  Lets go! ⚡⚡⚡`));
   console.log(chalk.green('\nI\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.updateIntervalSeconds) + ' seconds...\n'));
+}
+
+
+//------------------------------------------
+//------------------------------------------
+
+// check these new statuses against the old ones to see if any any have come in stock that weren't previously
+// this is so we don't send another notification for a model that has already had a notification sent for it
+
+function checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, cb) {
+  // first, ignore if in stock but has already had notification sent (active)
+  if (oneGigModelInStock && oneGigActive) {
+    oneGigModelInStock = false;
+  }
+  else {
+    // in stock and wasn't previously, send a notification and update the active status flag
+    if (oneGigModelInStock && !oneGigActive) {
+      oneGigActive = true;
+    }
+    if (!oneGigModelInStock && oneGigActive) {
+      oneGigActive = false;
+    }
+  }
+  if (twoGigModelInStock && twoGigActive) {
+    twoGigModelInStock = false;
+  }
+  else {
+    if (twoGigModelInStock && !twoGigActive) {
+      twoGigActive = true;
+    }
+    if (!twoGigModelInStock && twoGigActive) {
+      twoGigActive = false;
+    }
+  }
+  if (fourGigModelInStock && fourGigActive) {
+    fourGigModelInStock = false;
+  }
+  else {
+    if (fourGigModelInStock && !fourGigActive) {
+      fourGigActive = true;
+    }
+    if (!fourGigModelInStock && fourGigActive) {
+      fourGigActive = false;
+    }
+  }
+  if (eightGigModelInStock && eightGigActive) {
+    eightGigModelInStock = false;
+  }
+  else {
+    if (eightGigModelInStock && !eightGigActive) {
+      eightGigActive = true;
+    }
+    if (!eightGigModelInStock && eightGigActive) {
+      eightGigActive = false;
+    }
+  }
+
+  // return the updated statuses
+  cb(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
 }
 
 
