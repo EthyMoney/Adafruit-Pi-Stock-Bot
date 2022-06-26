@@ -1,7 +1,14 @@
 {
-  "discordBotToken": "",
+  "enableDiscordBot": true,
+  "enableSlackBot": true,
+  "discordBotToken": "".
   "discordServerID": "",
   "discordChannelName": "",
+  "slackBotToken": "",
+  "slackChannel1GB": "",
+  "slackChannel2GB": "",
+  "slackChannel4GB": "",
+  "slackChannel8GB": "",
   "updateIntervalSeconds": 30,
   "watch1GigModel": true,
   "watch2GigModel": true,

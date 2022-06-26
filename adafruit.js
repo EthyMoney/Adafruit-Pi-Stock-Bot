@@ -131,13 +131,73 @@ function checkStockStatus() {
       if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
         // report what is in stock
         console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
-        sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
+        if(config.enableDiscordBot){
+          sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
+        }
+        if (config.enableSlackBot){
+          sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock)
+        }
       }
     })
     .catch(function (error) {
       console.error(chalk.red('An error occurred during the status refresh:\n'), error);
     });
 }
+
+
+//------------------------------------------
+//------------------------------------------
+
+// Slack bot posting functions
+
+async function OneGBInStock() {
+  const url = 'https://slack.com/api/chat.postMessage';
+  const res = await axios.post(url, {
+    channel: config.slackChannel1GB,
+    username: 'ADAFRUIT RASPBERRY PI 1GB IN STOCK',
+    link_names: true,
+    text: '@channel ADAFRUIT HAS 1GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4295|BUY IT>'
+  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
+
+  console.log('Done', res.data)
+}
+
+async function TwoGBInStock() {
+  const url = 'https://slack.com/api/chat.postMessage';
+  const res = await axios.post(url, {
+    channel: config.slackChannel2GB,
+    username: 'ADAFRUIT RASPBERRY PI 2GB IN STOCK',
+    link_names: true,
+    text: '@channel ADAFRUIT HAS 2GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4292|BUY IT>'
+  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
+
+  console.log('Done', res.data)
+}
+
+async function FourGBInStock() {
+  const url = 'https://slack.com/api/chat.postMessage';
+  const res = await axios.post(url, {
+    channel: config.slackChannel4GB,
+    username: 'ADAFRUIT RASPBERRY PI 4GB IN STOCK',
+    link_names: true,
+    text: '@channel ADAFRUIT HAS 4GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4296|BUY IT>'
+  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
+
+  console.log('Done', res.data)
+}
+
+async function EightGBInStock() {
+  const url = 'https://slack.com/api/chat.postMessage';
+  const res = await axios.post(url, {
+    channel: config.slackChannel8GB,
+    username: 'ADAFRUIT RASPBERRY PI 8GB IN STOCK',
+    link_names: true,
+    text: '@channel ADAFRUIT HAS 8GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4564|BUY IT>'
+  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
+
+  console.log('Done', res.data)
+}
+
 
 
 //------------------------------------------
@@ -211,6 +271,27 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
   }
   else {
     console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discordChannelName + '"')), chalk.yellow('Did you delete/rename it? Can I see it? Check your config!'));
+  }
+}
+
+
+//------------------------------------------
+//------------------------------------------
+
+// function to send stock statuses to Slack
+
+function sendToSlack(){
+  if (oneGigModelInStock && config.watch1GigModel){
+    OneGBInStock();
+  }
+  if (twoGigModelInStock && config.watch2GigModel){
+    TwoGBInStock();
+  }
+  if(fourGigModelInStock && config.watch4GigModel){
+    FourGBInStock();
+  }
+  if(eightGigModelInStock && config.watch8GigModel){
+    EightGBInStock();
   }
 }
 
