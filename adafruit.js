@@ -167,12 +167,12 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
   if (oneGigModelInStock && config.watch1GigModel) {
     embed.addField('1GB Model', '[BUY IT!](https://www.adafruit.com/product/4295)', true);
     const oneGigRole = rolesCache.find(role => role.name === 'Pi4 1GB');
-    mentionRolesMessage += (oneGigRole) ? ` ${oneGigRole.id} ` : console.error(chalk.red('No 1GB role found!'));
+    mentionRolesMessage += (oneGigRole) ? ` ${oneGigRole} ` : console.error(chalk.red('No 1GB role found!'));
   }
   if (twoGigModelInStock && config.watch2GigModel) {
     embed.addField('2GB Model', '[BUY IT!](https://www.adafruit.com/product/4292)', true);
     const twoGigRole = rolesCache.find(role => role.name === 'Pi4 2GB');
-    mentionRolesMessage += (twoGigRole) ? ` ${twoGigRole.id} ` : console.error(chalk.red('No 2GB role found!'));
+    mentionRolesMessage += (twoGigRole) ? ` ${twoGigRole} ` : console.error(chalk.red('No 2GB role found!'));
   }
   if (fourGigModelInStock && config.watch4GigModel) {
     embed.addField('4GB Model', '[BUY IT!](https://www.adafruit.com/product/4296)', true);
