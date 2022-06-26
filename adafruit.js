@@ -50,10 +50,10 @@ const config               = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
 // flags indicating current stock status of each model (used to prevent sending the same in-stock messages multiple times)
-let oneGigActive = false;
-let twoGigActive = false;
-let fourGigActive = false;
-let eightGigActive = false;
+let oneGigActive           = false;
+let twoGigActive           = false;
+let fourGigActive          = false;
+let eightGigActive         = false;
 
 // connect to discord
 client.login(config.discordBotToken);
@@ -131,11 +131,11 @@ function checkStockStatus() {
       if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
         // report what is in stock
         console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
-        if(config.enableDiscordBot){
+        if (config.enableDiscordBot) {
           sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
         }
-        if (config.enableSlackBot){
-          sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock)
+        if (config.enableSlackBot) {
+          sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
         }
       }
     })
@@ -148,62 +148,53 @@ function checkStockStatus() {
 //------------------------------------------
 //------------------------------------------
 
-// Slack bot posting functions
+// slack bot posting functions
 
 async function OneGBInStock() {
   const url = 'https://slack.com/api/chat.postMessage';
-  const res = await axios.post(url, {
+  await axios.post(url, {
     channel: config.slackChannel1GB,
     username: 'ADAFRUIT RASPBERRY PI 1GB IN STOCK',
     link_names: true,
     text: '@channel ADAFRUIT HAS 1GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4295|BUY IT>'
   }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-
-  console.log('Done', res.data)
 }
 
 async function TwoGBInStock() {
   const url = 'https://slack.com/api/chat.postMessage';
-  const res = await axios.post(url, {
+  await axios.post(url, {
     channel: config.slackChannel2GB,
     username: 'ADAFRUIT RASPBERRY PI 2GB IN STOCK',
     link_names: true,
     text: '@channel ADAFRUIT HAS 2GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4292|BUY IT>'
   }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-
-  console.log('Done', res.data)
 }
 
 async function FourGBInStock() {
   const url = 'https://slack.com/api/chat.postMessage';
-  const res = await axios.post(url, {
+  await axios.post(url, {
     channel: config.slackChannel4GB,
     username: 'ADAFRUIT RASPBERRY PI 4GB IN STOCK',
     link_names: true,
     text: '@channel ADAFRUIT HAS 4GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4296|BUY IT>'
   }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-
-  console.log('Done', res.data)
 }
 
 async function EightGBInStock() {
   const url = 'https://slack.com/api/chat.postMessage';
-  const res = await axios.post(url, {
+  await axios.post(url, {
     channel: config.slackChannel8GB,
     username: 'ADAFRUIT RASPBERRY PI 8GB IN STOCK',
     link_names: true,
     text: '@channel ADAFRUIT HAS 8GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4564|BUY IT>'
   }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-
-  console.log('Done', res.data)
 }
 
 
-
 //------------------------------------------
 //------------------------------------------
 
-// this function does the job of verifying the severs channels and roles, then sending the actual notification messages to discord
+// this function handles verifying the severs channels and roles for discord, then sending the actual notification messages out
 
 function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
   console.log(chalk.greenBright('Sending stock status to Discord...'));
@@ -280,17 +271,17 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
 
 // function to send stock statuses to Slack
 
-function sendToSlack(){
-  if (oneGigModelInStock && config.watch1GigModel){
+function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
+  if (oneGigModelInStock && config.watch1GigModel) {
     OneGBInStock();
   }
-  if (twoGigModelInStock && config.watch2GigModel){
+  if (twoGigModelInStock && config.watch2GigModel) {
     TwoGBInStock();
   }
-  if(fourGigModelInStock && config.watch4GigModel){
+  if (fourGigModelInStock && config.watch4GigModel) {
     FourGBInStock();
   }
-  if(eightGigModelInStock && config.watch8GigModel){
+  if (eightGigModelInStock && config.watch8GigModel) {
     EightGBInStock();
   }
 }
