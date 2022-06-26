@@ -5,7 +5,7 @@
   <a href="">[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/blob/main/LICENSE)</a>
   <a href="">[![issues - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/issues/EthyMoney/Adafruit-Pi4-Stock-Bot)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/issues)</a>
   <a href="">[![Node.js - >=16.15.1](https://img.shields.io/badge/Node.js->=16.15.1-brightgreen?logo=node.js)](https://nodejs.org/en/)</a>
-  <a href="">[![Discord.js - 13.8.1](https://img.shields.io/badge/Discord.js-13.8.1-blue?logo=discord&logoColor=https%3A%2F%2Fdiscord.js.org%2F%23%2F)](https://nodejs.org/en/)</a>
+  <a href="">[![Discord.js - 13.8.1](https://img.shields.io/badge/Discord.js-13.8.1-blue?logo=discord&logoColor=https%3A%2F%2Fdiscord.js.org%2F%23%2F)](https://discord.js.org/)</a>
   
 </div>
 
@@ -35,8 +35,8 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Give your bot application a name and hit create.
 * From the left side navigation column, select the "Bot" tab (has a puzzle piece icon), confirm with the "Yes, do it!" button.
 * From here, go ahead and set a username and avatar for your new bot. You'll want to uncheck the "Public Bot" option as well.
-* Now we need to make an invite link so you add the bot to your server. From the left side navigation column, select the "General Information" tab.
-* Copy your "Application ID" shown there. We will put this into the following template link so it can identify your bot.
+* Now you need to make an invite link so you can add the bot to your server. From the left side navigation column, select the "General Information" tab.
+* Copy your "Application ID" shown there. You will put this into the following template link so it can identify your bot.
 * Use this invite link as your template: `https://discord.com/oauth2/authorize?client_id=APPLICATION_ID_HERE&scope=bot&permissions=412652817488`
 * Replace `APPLICATION_ID_HERE` in that link with your actual application ID you copied earlier.
 * Now go ahead and use that link to add your bot to your server. Be sure to leave all permissions checked! These are pre-configured for you.
