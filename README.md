@@ -1,12 +1,48 @@
+# Adafruit Pi4 Stock Alert Bot &nbsp;&nbsp;
+[![EthyMoney - Adafruit-Pi4-Stock-Bot](https://img.shields.io/static/v1?label=EthyMoney&message=Adafruit-Pi4-Stock-Bot&color=blue&logo=github)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot "Go to GitHub repo")
+[![stars - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/stars/EthyMoney/Adafruit-Pi4-Stock-Bot?style=social)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot) [![forks - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/forks/EthyMoney/Adafruit-Pi4-Stock-Bot?style=social)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot) [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/blob/main/LICENSE)
+[![issues - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/issues/EthyMoney/Adafruit-Pi4-Stock-Bot)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/issues) [![Node.js - >=16.15.1](https://img.shields.io/badge/Node.js->=16.15.1-brightgreen?logo=node.js)](https://nodejs.org/en/) [![Discord.js - 13.8.1](https://img.shields.io/badge/Discord.js-13.8.1-blue?logo=discord&logoColor=https%3A%2F%2Fdiscord.js.org%2F%23%2F)](https://nodejs.org/en/)
+<br><br>
+<p align="center">
+  <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://imgur.com/6AsuLxP.png" alt="Raspberry Pi 4 Model B" width="35%" height="auto">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
+</p>
+<br><br>
 
-# 🚧 🛑 STOP! THIS IS WORK IN PROGRESS! 🛑 🚧
-### **This bot is NOT done and still in active development. All or parts of it will not be functional during this stage. A release will be published as soon as it's ready for use :)**
-<br>
-<br>
+## What This Is
+A simple Discord bot that that checks the stock status of all the Raspberry Pi 4 (model B) models on Adafruit and sends a message to a Discord channel when one is in stock.
 
-# Adafruit-Pi4-Stock-Bot
-A simple Discord bot that that checks the stock status of all the Raspberry Pi 4 models on Adafruit and sends a message to a Discord channel when one is in stock.
-
-# Why?
+## Why?
 Because Adafruit's stock notification system sucks. It's a FIFO queue where the whole queue gets cleared any time any stock comes in. This means that your notification subscription will get removed even if your notification never got triggered during restock because the restock quantity was smaller than the queue size. This means that every time any restock happens at all, even if it's small and doesn't trigger your notification, you'll have to go back and re-subscribe to the notifications. This bot removes the need for that by allowing you to quickly get a @mention in your Discord server every time there is a restock!
 
+## How It Works
+On a set interval, the bot will query Adafruit's product page for the Pi 4 model B and watch for any of the stock statuses to change to "In stock". If one or more of the models come in stock, a notification is sent out to the configured discord server channel with accompanying @role mentions. The notification will contain a direct link to the page of the SKU that's in stock so you can buy it right away. Stock statuses are tracked between update intervals, so you won't have to get spammed with the same notification on every check if the bot has already sent a notification for a current stock event of a particular model. This is handled in a smart way to ensure you always get *one* notification every time any model comes in stock, and never miss a restock!
+
+## How to Setup and Run
+* Install Node.js LTS edition on your machine. [Grab it here!](https://nodejs.org)
+* Clone the repo, then run `npm install` from a terminal in the root project folder.
+* Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click "New Application" at the top.
+* Give your bot application a name and hit create.
+* From the left side navigation column, select the "Bot" tab (has a puzzle piece icon), confirm with the "Yes, do it!" button.
+* From here, go ahead and set a username and avatar for your new bot. You'll want to uncheck the "Public Bot" option as well.
+* Now we need to make an invite link so you add the bot to your server. From the left side navigation column, select the "General Information" tab.
+* Copy your "Application ID" shown there. We will put this into the following template link so it can identify your bot.
+* Use this invite link as your template: `https://discord.com/oauth2/authorize?client_id=APPLICATION_ID_HERE&scope=bot&permissions=412652817488`
+* Replace `APPLICATION_ID_HERE` in that link with your actual application ID you copied earlier.
+* Now go ahead and use that link to add your bot to your server. Be sure to leave all permissions checked! These are pre-configured for you.
+* It's important that you add the bot to your server before you proceed. The bot program expects to already be in the server when it starts up.
+* Now, you need to configure the `config.json` file for your use. Open the file in a text editor.
+* Enter your bot's token. This can be found back in the developer portal under the "Bot" tab again. Click on "Reset Token" and copy it. KEEP THIS PRIVATE!
+* Now enter the ID number of the server you added the bot to earlier. You can get from within Discord by right clicking on the server icon (with developer options enabled in settings)
+* Now enter the name of the channel in your server where you'd like to have updates posted. You can leave this blank if you want the bot to create a new one for you.
+* Finally, enter the update interval (default is 30 seconds) and set any models you don't wish to monitor to false (all are true by default).
+* Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory.
+* That's it! I hope you get your pi! :)
+
+## One More Thing
+Like this bot? Show some support! Give me a star on this repo and share it with your friends! :)<br>
+Contributions are welcome and encouraged! Feel free to open a pull request or issue for things you notice or want to fix/improve.<br>
+If you want to chat, you can find me in the support Discord server of my other popular bot that I made called TsukiBot, [JOIN HERE!](https://discord.gg/t7Ka9ycEyD)
