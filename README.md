@@ -1,8 +1,15 @@
+<div align="center">
+  
 # Adafruit Pi4 Stock Alert Bot &nbsp;&nbsp;
-[![EthyMoney - Adafruit-Pi4-Stock-Bot](https://img.shields.io/static/v1?label=EthyMoney&message=Adafruit-Pi4-Stock-Bot&color=blue&logo=github)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot "Go to GitHub repo")
-[![stars - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/stars/EthyMoney/Adafruit-Pi4-Stock-Bot?style=social)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot) [![forks - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/forks/EthyMoney/Adafruit-Pi4-Stock-Bot?style=social)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot) [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/blob/main/LICENSE)
-[![issues - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/issues/EthyMoney/Adafruit-Pi4-Stock-Bot)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/issues) [![Node.js - >=16.15.1](https://img.shields.io/badge/Node.js->=16.15.1-brightgreen?logo=node.js)](https://nodejs.org/en/) [![Discord.js - 13.8.1](https://img.shields.io/badge/Discord.js-13.8.1-blue?logo=discord&logoColor=https%3A%2F%2Fdiscord.js.org%2F%23%2F)](https://nodejs.org/en/)
-<br><br>
+  <a href="">[![GitHub tag](https://img.shields.io/github/tag/EthyMoney/Adafruit-Pi4-Stock-Bot?include_prereleases=&sort=semver&color=blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/releases/)</a>
+  <a href="">[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/blob/main/LICENSE)</a>
+  <a href="">[![issues - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/issues/EthyMoney/Adafruit-Pi4-Stock-Bot)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/issues)</a>
+  <a href="">[![Node.js - >=16.15.1](https://img.shields.io/badge/Node.js->=16.15.1-brightgreen?logo=node.js)](https://nodejs.org/en/)</a>
+  <a href="">[![Discord.js - 13.8.1](https://img.shields.io/badge/Discord.js-13.8.1-blue?logo=discord&logoColor=https%3A%2F%2Fdiscord.js.org%2F%23%2F)](https://nodejs.org/en/)</a>
+  
+</div>
+
+<br>
 <p align="center">
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -21,7 +28,7 @@ Because Adafruit's stock notification system sucks. It's a FIFO queue where the 
 ## How It Works
 On a set interval, the bot will query Adafruit's product page for the Pi 4 model B and watch for any of the stock statuses to change to "In stock". If one or more of the models come in stock, a notification is sent out to the configured discord server channel with accompanying @role mentions. The notification will contain a direct link to the page of the SKU that's in stock so you can buy it right away. Stock statuses are tracked between update intervals, so you won't have to get spammed with the same notification on every check if the bot has already sent a notification for a current stock event of a particular model. This is handled in a smart way to ensure you always get *one* notification every time any model comes in stock, and never miss a restock!
 
-## How to Setup and Run
+## How to Set Up and Run
 * Install Node.js LTS edition on your machine. [Grab it here!](https://nodejs.org)
 * Clone the repo, then run `npm install` from a terminal in the root project folder.
 * Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click "New Application" at the top.
