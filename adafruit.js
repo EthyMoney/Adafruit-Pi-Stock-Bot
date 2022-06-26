@@ -38,7 +38,7 @@
 // -------------------------------------------
 // -------------------------------------------
 
-const { MessageEmbed, Client, Intents, ShardClientUtil } = require('discord.js');
+const { MessageEmbed, Client, Intents, ShardClientUtil, Permissions } = require('discord.js');
 const client               = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES], shards: 'auto' });
 const axios                = require('axios').default;
 const jsdom                = require('jsdom');
@@ -210,7 +210,7 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
     }
   }
   else {
-    console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discordChannelName + '"')), chalk.yellow('Did you delete it? Can I see it? Check your config!'));
+    console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discordChannelName + '"')), chalk.yellow('Did you delete/rename it? Can I see it? Check your config!'));
   }
 }
 
@@ -247,12 +247,21 @@ function setupServer() {
   });
   // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
   if (!configuredGuild.channels.cache.find(c => c.name == config.discordChannelName)) {
-    configuredGuild.channels.create({ data: { name: 'pi4-stock-notifications' } })
+    configuredGuild.channels.create('pi4-stock-notifications', {
+      type: 'GUILD_TEXT',
+      permissionOverwrites: [
+        {
+          id: client.user.id,
+          allow: [Permissions.FLAGS.EMBED_LINKS, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL]
+        },
+      ],
+    })
       .then(channel => {
         // set the notification channel in the config to be this new one (so it can be used in the future)
         config.discordChannelName = 'pi4-stock-notifications';
         fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
-        console.log(chalk.green(`You didn't provide a channel name or it wasn't able to be found in the server, so I created and set a new default notification channel for you: ${channel.name}`));
+        console.log(chalk.green('You didn\'t provide a channel name or it wasn\'t able to be found in the server, so I created one for you!'));
+        console.log(chalk.green(`The new channel is named: ${chalk.cyan(channel.name)}`));
       })
       .catch(err => {
         console.error(
