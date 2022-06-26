@@ -1,6 +1,6 @@
 {
   "name": "adafruit-pi4-stock-bot",
-  "version": "1.0.0-BETA",
+  "version": "1.0.0",
   "description": "A simple Discord bot that that checks the stock status of all of the Raspberry Pi 4 models on Adafruit and sends a message to a Discord channel when one is in stock.",
   "main": "adafruit.js",
   "scripts": {
@@ -37,7 +37,6 @@
     "axios": "^0.27.2",
     "chalk": "^4.1.2",
     "discord.js": "^13.8.1",
-    "jsdom": "^20.0.0",
-    "topgg-autoposter": "^2.0.1"
+    "jsdom": "^20.0.0"
   }
 }

@@ -1,8 +1,9 @@
 {
   "enableDiscordBot": true,
-  "discordBotToken": "",
-  "channelNameToSendUpdatesTo": "general",
   "enableSlackBot": true,
+  "discordBotToken": "".
+  "discordServerID": "",
+  "discordChannelName": "",
   "slackBotToken": "",
   "slackChannel1GB": "",
   "slackChannel2GB": "",
