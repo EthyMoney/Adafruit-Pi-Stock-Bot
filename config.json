@@ -2,6 +2,7 @@
   "enableDiscordBot": true,
   "enableSlackBot": true,
   "discordBotToken": "",
+  "discordServerID": "",
   "discordChannelName": "",
   "slackBotToken": "",
   "slackChannel1GB": "",
