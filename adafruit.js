@@ -55,8 +55,8 @@ let twoGigActive           = false;
 let fourGigActive          = false;
 let eightGigActive         = false;
 
-// connect to discord
-client.login(config.discordBotToken);
+// connect to discord (if discord bot is enabled)
+if (config.enableDiscordBot) client.login(config.discordBotToken);
 
 // schedule the stock status update to be called at the specified interval
 setInterval(() => { checkStockStatus(); }, config.updateIntervalSeconds * 1000);
