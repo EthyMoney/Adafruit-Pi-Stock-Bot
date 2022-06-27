@@ -15,7 +15,7 @@
 <p align="center">
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://imgur.com/6AsuLxP.png" alt="Raspberry Pi 4 Model B" width="35%" height="auto">
+  <img src="https://imgur.com/aldX3qJ.png" alt="Raspberry Pi 4 Model B" width="35%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
 </p>
@@ -25,10 +25,10 @@
 A simple Discord and/or Slack bot that checks the stock status of all the Raspberry Pi 4 (model B) models on Adafruit and sends a message to a Discord/Slack channel when one is in stock. This bot is designed to be self-hosted and run for use in your own Discord server or Slack workspace.
 
 ## Why?
-Because Adafruit's stock notification system sucks. It's a FIFO queue where the whole queue gets cleared any time any stock comes in. This means that your notification subscription will get removed even if your notification never got triggered during restock because the restock quantity was smaller than the queue size. This means that every time any restock happens at all, even if it's small and doesn't trigger your notification, you'll have to go back and re-subscribe to the notifications. This bot removes the need for that by allowing you to quickly get a @mention in your Discord server every time there is a restock!
+Because Adafruit's stock notification system sucks. It's a FIFO queue where the whole queue gets cleared any time any stock comes in. This means that your notification subscription will get removed even if your notification never got triggered during restock because the restock quantity was smaller than the queue size. This means that every time any restock happens at all, even if it's small and doesn't trigger your notification, you'll have to go back and re-subscribe to the notifications. This bot removes the need for that by allowing you to quickly get a @mention in your Discord server or a message in your Slack channels every time there is a restock!
 
 ## How It Works
-On a set interval, the bot will query Adafruit's product page for the Pi 4 model B and watch for any of the stock statuses to change to "In stock". If one or more of the models come in stock, a notification is sent out to the configured Discord server channel with accompanying @role mentions. For Slack, it will send the notification to the specified channels since Slack doesn't have roles like Discord does. In either case, the notification will contain a direct link to the page of the SKU that's in stock so you can buy it right away. Stock statuses are tracked between update intervals, so you won't have to get spammed with the same notification on every check if the bot has already sent a notification for a current stock event of a particular model. This is handled in a smart way to ensure you always get *one* notification every time any model comes in stock, and never miss a restock!
+On a set interval, the bot will query Adafruit's product page for the Pi 4 model B and watch for any of the stock statuses to change to "In stock". If one or more of the models come in stock, a notification is sent out to the configured Discord server channel with accompanying @role mentions. For Slack, it will send the notification to the specified channels since Slack doesn't have roles like Discord does. In either case, the notification will contain a direct link to the page of the SKU that's in stock so you can buy it right away. Stock statuses are tracked between update intervals, so you won't have to get spammed with the same notification on every check if the bot has already sent a notification for a current stock event of a particular model. This is handled in a smart way to ensure you always get *one* notification every time any model comes in stock, while never missing a restock!
 
 ## How to Set Up and Run
 * Install [Node.js](https://nodejs.org) LTS edition for your specific environment using the site or a package manager. Node.js is supported basically everywhere which allows this bot to be multi-platform!
