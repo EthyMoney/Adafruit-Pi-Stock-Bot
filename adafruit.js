@@ -298,13 +298,14 @@ function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock
 // function that runs on startup to set up the configured discord server with the necessary roles and a notification channel to post in
 
 function setupDiscordServer() {
-  // first, create the roles for the server if they don't exist yet (in RGB cus we're real gamers here)
-  const roles = [
-    { name: 'Pi4 1GB', color: 'RED' },
-    { name: 'Pi4 2GB', color: 'GREEN' },
-    { name: 'Pi4 4GB', color: 'BLUE' },
-    { name: 'Pi4 8GB', color: 'PURPLE' },
-  ];
+  // first, define the roles we need in the server based on the config (in RGB cus we're real gamers here)
+  const roles = [];
+  if (config.watch1GigModel) roles.push({ name: 'Pi4 1GB', color: 'RED' });
+  if (config.watch2GigModel) roles.push({ name: 'Pi4 2GB', color: 'GREEN' });
+  if (config.watch4GigModel) roles.push({ name: 'Pi4 4GB', color: 'BLUE' });
+  if (config.watch8GigModel) roles.push({ name: 'Pi4 8GB', color: 'PURPLE' });
+
+  // create the roles in the server if they don't exist yet
   roles.forEach(role => {
     if (!configuredGuild.roles.cache.find(r => r.name == role.name)) {
       configuredGuild.roles.create({ name: role.name, color: role.color })
