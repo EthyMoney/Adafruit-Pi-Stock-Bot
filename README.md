@@ -31,8 +31,8 @@ Because Adafruit's stock notification system sucks. It's a FIFO queue where the 
 On a set interval, the bot will query Adafruit's product page for the Pi 4 model B and watch for any of the stock statuses to change to "In stock". If one or more of the models come in stock, a notification is sent out to the configured Discord server channel with accompanying @role mentions. For Slack, it will send the notification to the specified channels since Slack doesn't have roles like Discord does. In either case, the notification will contain a direct link to the page of the SKU that's in stock so you can buy it right away. Stock statuses are tracked between update intervals, so you won't have to get spammed with the same notification on every check if the bot has already sent a notification for a current stock event of a particular model. This is handled in a smart way to ensure you always get *one* notification every time any model comes in stock, and never miss a restock!
 
 ## How to Set Up and Run
-* Install Node.js LTS edition on your machine. [Grab it here!](https://nodejs.org)
-* Clone the repo, then run `npm install` from a terminal in the root project folder.
+* Install [Node.js](https://nodejs.org) LTS edition for your specific environment using the site or a package manager. Node.js is supported basically everywhere which allows this bot to be multi-platform!
+* Clone the repo, then run `npm install` from a terminal in the root project folder. This installs all necessary dependencies for you.
 * Follow the below instructions for setting up a Discord or Slack bot (or even both!). Be sure to complete the [final steps](#final-configuration-steps-and-bot-startup) as well once you finish the Discord and Slack specific instructions.
 
 ### Discord Bot Set Up
