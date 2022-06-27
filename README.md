@@ -54,7 +54,10 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Give your Slack App a name and select the workspace you'd like it to post notifications to.
 * Under the "Add features and functionality" section select the "Bots" option.
 * Along the left side under the "Features" section select "OAuth & Permissions". Once selected, scroll down to the "Scopes" section.
-* Select the "chat:write", "chat:write.customize", and "chat:write.public" scopes.
+* In the Bot Token Scopes section Select the 
+  * "chat:write", 
+  * "chat:write.customize", 
+  * and "chat:write.public" scopes.
 * Select "Install App" from the left column under "Settings", and allow the app to access your selected workspace.
 * Copy the "Bot User OAuth Token" and paste it in the slackBotToken parameter in the `config.json`.
 * Create at least one channel for the bot to post into. You can utilize up to four channels to receive @channel notifications for specific models of Raspberry Pi's.
