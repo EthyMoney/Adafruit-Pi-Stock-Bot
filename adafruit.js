@@ -86,7 +86,7 @@ client.on('ready', () => {
     console.error(chalk.red(`Error looking up guild with provided ID ${config.discordServerID}\n:`), err);
   }
   // verify and set up the configured discord server if it's not already set up
-  setupServer();
+  setupDiscordServer();
   // run a stock status check on startup (will run on configured interval after this)
   checkStockStatus();
 });
@@ -119,7 +119,7 @@ function checkStockStatus() {
       let fourGigModelInStock = stockList[2].textContent.includes('In stock');
       let eightGigModelInStock = stockList[3].textContent.includes('In stock');
 
-      // verify that the stock status of each model has changed since the last check and update flags
+      // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
       checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, (adjustedOneGig, adjustedTwoGig, adjustedFourGig, adjustedEightGig) => {
         oneGigModelInStock = adjustedOneGig;
         twoGigModelInStock = adjustedTwoGig;
@@ -127,9 +127,8 @@ function checkStockStatus() {
         eightGigModelInStock = adjustedEightGig;
       });
 
-      // send the stock status to discord if any of the models are in stock
+      // send the stock status to discord/slack if any of the models are in stock
       if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
-        // report what is in stock
         console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
         if (config.enableDiscordBot) {
           sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
@@ -194,7 +193,7 @@ async function EightGBInStock() {
 //------------------------------------------
 //------------------------------------------
 
-// this function handles verifying the severs channels and roles for discord, then sending the actual notification messages out
+// this function handles verifying the servers, channels, and roles for discord, then sending the actual notification messages out
 
 function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
   console.log(chalk.greenBright('Sending stock status to Discord...'));
@@ -296,10 +295,10 @@ function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock
 // -------------------------------------------
 // -------------------------------------------
 
-// function that runs on startup to set up the configured discord server with the necessary roles and notification channel
+// function that runs on startup to set up the configured discord server with the necessary roles and a notification channel to post in
 
-function setupServer() {
-  // first, create the roles roles for the server if they don't exist yet (in RGB cus we're real gamers here)
+function setupDiscordServer() {
+  // first, create the roles for the server if they don't exist yet (in RGB cus we're real gamers here)
   const roles = [
     { name: 'Pi4 1GB', color: 'RED' },
     { name: 'Pi4 2GB', color: 'GREEN' },
