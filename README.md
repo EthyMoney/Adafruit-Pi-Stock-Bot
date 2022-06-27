@@ -52,7 +52,7 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Now enter the name of the channel in your server where you'd like to have updates posted. You can leave this blank if you want the bot to create a new one for you.
 
 ### Slack Bot Set Up
-* Go to the [Slack App API](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot.git) and click "Create New App".
+* Go to the [Slack App API](https://api.slack.com/) and click "Create an app".
 * Give your Slack App a name and select the workspace you'd like it to post notifications to.
 * Under the "Add features and functionality" section select the "Bots" option.
 * Along the left side under the "Features" section select "OAuth & Permissions". Once selected, scroll down to the "Scopes" section.
