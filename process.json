@@ -1,0 +1,19 @@
+{
+  "apps": [
+    {
+      "name": "adafruit",
+      "script": "adafruit.js",
+      "log_date_format": "YYYY-MM-DD HH:mm",
+      "ignoreWatch": [
+        "node_modules"
+      ],
+      "watch": false,
+      "args": [
+        "--color"
+      ],
+      "env": {
+        "DEBUG_COLORS": true
+      }
+    }
+  ]
+}
