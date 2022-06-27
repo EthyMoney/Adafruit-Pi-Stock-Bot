@@ -33,9 +33,9 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 ## How to Set Up and Run
 * Install Node.js LTS edition on your machine. [Grab it here!](https://nodejs.org)
 * Clone the repo, then run `npm install` from a terminal in the root project folder.
-* Follow the below sets of instructions for using using as a Discord or Slack bot (or even both!). Be sure to follow the "Finally" section at the bottom as well!
+* Follow the below instructions for setting up a Discord or Slack bot (or even both!). Be sure to complete the [final steps](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/main/README.md#final-configuration-steps-and-bot-startup) as well once you finish the Discord and Slack specific instructions.
 
-### Utilizing a Discord Bot
+### Discord Bot Set Up
 * Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click "New Application" at the top.
 * Give your bot application a name and hit create.
 * From the left side navigation column, select the "Bot" tab (has a puzzle piece icon), click "Add Bot" and confirm with the "Yes, do it!" button.
@@ -51,7 +51,7 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Now enter the ID number of the server you added the bot to earlier. You can get from within Discord by right clicking on the server icon (with developer options enabled in settings)
 * Now enter the name of the channel in your server where you'd like to have updates posted. You can leave this blank if you want the bot to create a new one for you.
 
-### Utilizing a Slack Bot
+### Slack Bot Set Up
 * Go to the [Slack App API](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot.git) and click "Create New App".
 * Give your Slack App a name and select the workspace you'd like it to post notifications to.
 * Under the "Add features and functionality" section select the "Bots" option.
@@ -65,7 +65,7 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Create at least one channel for the bot to post into. You can utilize up to four channels to receive @channel notifications for specific models of Raspberry Pi's.
 * Put the channel names in the `config.json` into the respective fields. For example, if you wanted 1GB updates to post to #general, put "#general" in the slackChannel1GB field. If you want to have a single channel mentioned for all models of raspberry pi's put the same channel into every slackChannel config or create mutliple channels.
 
-### Finally
+### Final Configuration Steps and Bot Startup
 * Indicate whether you are using the Discord bot, Slack bot, or even both, using the `enableDiscordBot`, or `enableSlackBot` fields of the config file. These are both on(true) by default, adjust them accordingly if needed.
 * Enter the update interval (default is 30 seconds) and set any models you don't wish to monitor to false (all are true by default).
 * Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory.
