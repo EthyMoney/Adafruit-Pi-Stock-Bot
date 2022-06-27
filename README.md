@@ -33,7 +33,7 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 ## How to Set Up and Run
 * Install Node.js LTS edition on your machine. [Grab it here!](https://nodejs.org)
 * Clone the repo, then run `npm install` from a terminal in the root project folder.
-* Follow the below instructions for setting up a Discord or Slack bot (or even both!). Be sure to complete the [final steps](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/main/README.md#final-configuration-steps-and-bot-startup) as well once you finish the Discord and Slack specific instructions.
+* Follow the below instructions for setting up a Discord or Slack bot (or even both!). Be sure to complete the [final steps](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/blob/main/README.md#final-configuration-steps-and-bot-startup) as well once you finish the Discord and Slack specific instructions.
 
 ### Discord Bot Set Up
 * Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click "New Application" at the top.
