@@ -52,17 +52,19 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Now enter the name of the channel in your server where you'd like to have updates posted. You can leave this blank if you want the bot to create a new one for you.
 
 ### Slack Bot Set Up
-* Go to the [Slack App API](https://api.slack.com/) and click "Create an app".
-* Give your Slack App a name and select the workspace you'd like it to post notifications to.
+* Go to the [Slack App API](https://api.slack.com/) and click "Create an app", then select "From scratch" in the popup that appears.
+* Give your Slack App a name and select your workspace you'd like to add the bot to, then click "Create App".
 * Under the "Add features and functionality" section select the "Bots" option.
-* Along the left side under the "Features" section select "OAuth & Permissions". Once selected, scroll down to the "Scopes" section.
-* In the Bot Token Scopes section Select the 
-  * "chat:write", 
+* Along the left side navigation under the "Features" section, select "OAuth & Permissions". Once selected, scroll down to the "Scopes" section.
+* Under "Bot Token Scopes", click the "Add an OAuth Scope" button and then add these scopes:
+  * "chat:write",
+  * "links:write",
+  * "channels:manage",
   * "chat:write.customize", 
-  * and "chat:write.public" scopes.
-* Select "Install App" from the left column under "Settings", and allow the app to access your selected workspace.
-* Copy the "Bot User OAuth Token" and paste it in the slackBotToken parameter in the `config.json`.
-* Create at least one channel for the bot to post into. You can utilize up to four channels to receive @channel notifications for specific models of Raspberry Pi's.
+  * and "chat:write.public".
+* Now scroll back up and click the "Install to Workspace" button. Allow the app access to your workspace using the "Allow" button on the screen that appears.
+* You will now be shown a page with your bot token. Copy the "Bot User OAuth Token" and paste it in the slackBotToken parameter in the `config.json`. KEEP THIS TOKEN SAFE AND PRIVATE!
+* Create at least one channel for the bot to post into. You can utilize up to four channels to each receive @channel notifications for specific models of Raspberry Pi's.
 * Put the channel names in the `config.json` into the respective fields. For example, if you wanted 1GB updates to post to #general, put "#general" in the slackChannel1GB field. If you want to have a single channel mentioned for all models of raspberry pi's put the same channel into every slackChannel config or create mutliple channels.
 
 ### Final Configuration Steps and Bot Startup
