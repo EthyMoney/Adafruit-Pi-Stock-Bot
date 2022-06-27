@@ -69,6 +69,7 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Indicate whether you are using the Discord bot, Slack bot, or even both, using the `enableDiscordBot`, or `enableSlackBot` fields of the config file. These are both on(true) by default, adjust them accordingly if needed.
 * Enter the update interval (default is 30 seconds) and set any models you don't wish to monitor to false (all are true by default).
 * Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory.
+* If you are using the Discord bot, be sure to add the roles it created to yourself and others so you get mentioned when stock comes in!
 * That's it! I hope you get your pi! :)
 
 ## One More Thing
