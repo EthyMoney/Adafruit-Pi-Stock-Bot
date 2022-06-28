@@ -280,7 +280,6 @@ async function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelI
 
   // nested function to post the message(s) (called for each model)
   async function postMessage(channel, username, messageText, model) {
-    console.log(channel, username, messageText, model);
     await axios.post(url, {
       channel: channel,
       username: username,
