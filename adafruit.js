@@ -147,53 +147,8 @@ function checkStockStatus() {
 //------------------------------------------
 //------------------------------------------
 
-// slack bot posting functions
-
-async function OneGBInStock() {
-  const url = 'https://slack.com/api/chat.postMessage';
-  await axios.post(url, {
-    channel: config.slackChannel1GB,
-    username: 'ADAFRUIT RASPBERRY PI 1GB IN STOCK',
-    link_names: true,
-    text: '@channel ADAFRUIT HAS 1GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4295|BUY IT>'
-  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-}
-
-async function TwoGBInStock() {
-  const url = 'https://slack.com/api/chat.postMessage';
-  await axios.post(url, {
-    channel: config.slackChannel2GB,
-    username: 'ADAFRUIT RASPBERRY PI 2GB IN STOCK',
-    link_names: true,
-    text: '@channel ADAFRUIT HAS 2GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4292|BUY IT>'
-  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-}
-
-async function FourGBInStock() {
-  const url = 'https://slack.com/api/chat.postMessage';
-  await axios.post(url, {
-    channel: config.slackChannel4GB,
-    username: 'ADAFRUIT RASPBERRY PI 4GB IN STOCK',
-    link_names: true,
-    text: '@channel ADAFRUIT HAS 4GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4296|BUY IT>'
-  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-}
-
-async function EightGBInStock() {
-  const url = 'https://slack.com/api/chat.postMessage';
-  await axios.post(url, {
-    channel: config.slackChannel8GB,
-    username: 'ADAFRUIT RASPBERRY PI 8GB IN STOCK',
-    link_names: true,
-    text: '@channel ADAFRUIT HAS 8GB RASPBERRY PI MODELS IN STOCK <https://www.adafruit.com/product/4564|BUY IT>'
-  }, { headers: { authorization: `Bearer ${config.slackBotToken}` } });
-}
-
-
-//------------------------------------------
-//------------------------------------------
-
-// this function handles verifying the servers, channels, and roles for discord, then sending the actual notification messages out
+// this function handles verifying the servers, channels, and roles for discord, then sending the actual notification message out
+// this will send *one* notification message embed that contains all models that are in stock, rather than separate messages for each model (like the slack function does)
 
 function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
   console.log(chalk.greenBright('Sending stock status to Discord...'));
@@ -269,20 +224,53 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
 //------------------------------------------
 //------------------------------------------
 
-// function to send stock statuses to Slack
+// function to send stock statuses to Slack for models that are in stock
+// this will send each model in stock as separate notification messages if multiple models are in stock at once
 
-function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
+async function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
+  console.log(chalk.greenBright('Sending stock status to Slack...'));
+  const url = 'https://slack.com/api/chat.postMessage';
+  const authorizationHeader = { headers: { authorization: `Bearer ${config.slackBotToken}` } };
   if (oneGigModelInStock && config.watch1GigModel) {
-    OneGBInStock();
+    const channel = config.slackChannel1GB;
+    const username = 'PI4 1GB IN STOCK';
+    const messageText = '@channel The 1GB model is in stock on Adafruit! <https://www.adafruit.com/product/4295|BUY IT>';
+    postMessage(channel, username, messageText, '1GB');
   }
   if (twoGigModelInStock && config.watch2GigModel) {
-    TwoGBInStock();
+    const channel = config.slackChannel2GB;
+    const username = 'PI4 2GB IN STOCK';
+    const messageText = '@channel The 2GB model is in stock on Adafruit! <https://www.adafruit.com/product/4292|BUY IT>';
+    postMessage(channel, username, messageText, '2GB');
   }
   if (fourGigModelInStock && config.watch4GigModel) {
-    FourGBInStock();
+    const channel = config.slackChannel4GB;
+    const username = 'PI4 4GB IN STOCK';
+    const messageText = '@channel The 4GB model is in stock on Adafruit! <https://www.adafruit.com/product/4296|BUY IT>';
+    postMessage(channel, username, messageText, '4GB');
   }
   if (eightGigModelInStock && config.watch8GigModel) {
-    EightGBInStock();
+    const channel = config.slackChannel8GB;
+    const username = 'PI4 8GB IN STOCK';
+    const messageText = '@channel The 8GB model is in stock on Adafruit! <https://www.adafruit.com/product/4564|BUY IT>';
+    postMessage(channel, username, messageText, '8GB');
+  }
+
+  // nested function to post the message(s) (called for each model)
+  async function postMessage(channel, username, messageText, model) {
+    console.log(channel, username, messageText, model);
+    await axios.post(url, {
+      channel: channel,
+      username: username,
+      link_names: true,
+      text: messageText
+    }, authorizationHeader)
+      .then(() => {
+        console.log(chalk.greenBright(`Successfully sent ${model} stock status to Slack!`));
+      })
+      .catch(function (reject) {
+        console.error(chalk.red(`Error sending ${model} stock status to Slack with promise rejection: ${reject}`));
+      });
   }
 }
 
