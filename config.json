@@ -1,6 +1,7 @@
 {
   "enableDiscordBot": true,
   "enableSlackBot": true,
+  "enableSleepMode": true,
   "discordBotToken": "",
   "discordServerID": "",
   "discordChannelName": "",
