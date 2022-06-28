@@ -112,9 +112,11 @@ function checkStockStatus() {
   if (config.enableSleepMode) {
     const currentTime = new Date();
     const currentHourUTC = currentTime.getUTCHours();
-    if (currentHourUTC >= 1 && currentHourUTC < 11 && !sleepModeActive) {
-      sleepModeActive = true;
-      console.log(chalk.yellow('Sleeping mode is now active, we\'ll not check stock status outside of Adafruit\'s hours!'));
+    if (currentHourUTC >= 1 && currentHourUTC < 11) {
+      if (!sleepModeActive) {
+        sleepModeActive = true;
+        console.log(chalk.yellow('Sleeping mode is now active, we\'ll not check stock status outside of Adafruit\'s hours!'));
+      }
       return;
     }
     else if (!(currentHourUTC >= 1 && currentHourUTC < 11) && sleepModeActive) {
