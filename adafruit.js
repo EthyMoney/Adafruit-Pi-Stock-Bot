@@ -208,6 +208,7 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
     .setDescription('The following models are in stock:\n')
     .setColor('#00ff00')
     .setThumbnail('https://cdn-shop.adafruit.com/970x728/4292-06.jpg')
+    .setTimestamp()
     .setFooter({
       text: 'github.com/EthyMoney/Adafruit-Pi4-Stock-Bot',
       iconURL: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
