@@ -68,10 +68,13 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Put the channel names in the `config.json` into the respective fields. For example, if you wanted 1GB updates to post to #general, put "#general" in the slackChannel1GB field. If you want to have a single channel mentioned for all models of raspberry pi's put the same channel into every slackChannel config or create mutliple channels.
 
 ### Final Configuration Steps and Bot Startup
-* Indicate whether you are using the Discord bot, Slack bot, or even both, using the `enableDiscordBot`, or `enableSlackBot` fields of the config file. These are both on(true) by default, adjust them accordingly if needed.
-* Enter the update interval (default is 30 seconds) and set any models you don't wish to monitor to false (all are true by default).
-* Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory.
-* If you are using the Discord bot, be sure to add the roles it created to yourself and others so you get mentioned when stock comes in!
+* In the `config.json` file:
+  * Indicate whether you are using the Discord bot, Slack bot, or even both, using the `enableDiscordBot`, or `enableSlackBot` fields of the config file. These are both on(true) by default, adjust them accordingly if needed.
+  * Enter the update interval in seconds for `updateIntervalSeconds` (default is 30 seconds). 
+  * Set any models you don't wish to monitor to false, using `watch1GigModel`, `watch2GigModel` and so on... (all are enabled(true) by default).
+  * Choose whether or not you want to have sleep mode enabled using `enableSleepMode`. Sleep mode just prevents the bot from querying Adafruit overnight when restocks aren't happening (this is enabled(true) by default). Prevents needless spam to Adafruit's servers!
+* Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory to launch the bot!.
+* If you are using the Discord bot, be sure to make use of the roles that the bot created! Add them to yourself and others so you get mentioned when stock comes in.
 * That's it! I hope you get your pi! :)
 
 ## One More Thing
