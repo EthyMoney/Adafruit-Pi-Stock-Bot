@@ -55,6 +55,9 @@ let twoGigActive           = false;
 let fourGigActive          = false;
 let eightGigActive         = false;
 
+// flag indicating if the bot is currently suspended from making queries to Adafruit.com (sleep mode to not query outside of their hours)
+let sleepModeActive        = false;
+
 // connect to discord (if discord bot is enabled)
 if (config.enableDiscordBot) client.login(config.discordBotToken);
 
@@ -104,6 +107,23 @@ client.on('ready', () => {
 // function to query the Adafruit website for the stock stats of all models of the Raspberry Pi 4 Model B
 
 function checkStockStatus() {
+  // if sleep mode is enabled in config.json, this will only check stock status between 6am to 8pm (CDT) (11am to 1am UTC)
+  // the website is only likely to be updated between these times so we don't need to spam Adafruit's servers overnight
+  if (config.enableSleepMode) {
+    const currentTime = new Date();
+    const currentHourUTC = currentTime.getUTCHours();
+    if (currentHourUTC >= 1 && currentHourUTC < 11 && !sleepModeActive) {
+      sleepModeActive = true;
+      console.log(chalk.yellow('Sleeping mode is now active, we\'ll not check stock status outside of Adafruit\'s hours!'));
+      return;
+    }
+    else if (!(currentHourUTC >= 1 && currentHourUTC < 11) && sleepModeActive) {
+      sleepModeActive = false;
+      console.log(chalk.green('Sleeping mode is now disabled, I\'m actively checking stock status again!'));
+    }
+  }
+
+  // proceed to make status query if sleep mode is not currently active or if it's not enabled
   axios.get('https://www.adafruit.com/product/4295')
     .then(function (response) {
       // on success, parse the HTML response into a DOM object
