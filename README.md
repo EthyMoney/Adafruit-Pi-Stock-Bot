@@ -76,6 +76,15 @@ On a set interval, the bot will query Adafruit's product page for the Pi 4 model
 * Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory to launch the bot!.
 * If you are using the Discord bot, be sure to make use of the roles that the bot created! Add them to yourself and others so you get mentioned when stock comes in.
 * That's it! I hope you get your pi! :)
+<br>
+
+## Here's What the Notification Messages Look Like
+<p align="center">
+  <img src="https://imgur.com/55fdrDT.png" alt="Discord Message" width="42%" height="auto">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://imgur.com/OOzKLZH.png" alt="Slack Message" width="51%" height="auto">
+</p>
+<br>
 
 ## One More Thing
 Like this bot? Show some support! Give me a star on this repo and share it with your friends! :)<br>
