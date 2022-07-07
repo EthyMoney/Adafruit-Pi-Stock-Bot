@@ -136,10 +136,11 @@ function checkStockStatus() {
       const stockList = dom.window.document.querySelector('div.mobile-button-row:nth-child(1) > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
 
       // gather the stock status of each model (represented as a boolean for being in-stock or not)
-      let oneGigModelInStock = stockList[0].textContent.includes('In stock');
-      let twoGigModelInStock = stockList[1].textContent.includes('In stock');
-      let fourGigModelInStock = stockList[2].textContent.includes('In stock');
-      let eightGigModelInStock = stockList[3].textContent.includes('In stock');
+      // check if the text doesn't contain the word "Out of Stock" (will be showing the price instead if it's in stock)
+      let oneGigModelInStock = stockList[0].textContent.toLowerCase().indexOf('out of stock') === -1;
+      let twoGigModelInStock = stockList[1].textContent.toLowerCase().indexOf('out of stock') === -1;
+      let fourGigModelInStock = stockList[2].textContent.toLowerCase().indexOf('out of stock') === -1;
+      let eightGigModelInStock = stockList[3].textContent.toLowerCase().indexOf('out of stock') === -1;
 
       // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
       checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, (adjustedOneGig, adjustedTwoGig, adjustedFourGig, adjustedEightGig) => {
