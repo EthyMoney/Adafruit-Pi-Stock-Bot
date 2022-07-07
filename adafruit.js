@@ -58,11 +58,23 @@ let eightGigActive         = false;
 // flag indicating if the bot is currently suspended from making queries to Adafruit.com (sleep mode to not query outside of their hours)
 let sleepModeActive        = false;
 
+// check that at least one bot is enabled and yell at the user if not
+if (!config.enableDiscordBot && !config.enableSlackBot) {
+  console.log(chalk.red('\n[ERROR]') + ' At least one bot must be enabled in config.json. Please enable the bot(s) you want to use and ensure they are configured properly. Exiting...');
+  console.log(chalk.yellow('See the README.md for more information if you need help.\n'));
+  process.exit(1);
+}
+
 // connect to discord (if discord bot is enabled)
 if (config.enableDiscordBot) client.login(config.discordBotToken);
 
 // schedule the stock status update to be called at the specified interval
 setInterval(() => { checkStockStatus(); }, config.updateIntervalSeconds * 1000);
+
+// show a startup message so the user knows the bot is running (if only using the Slack bot)
+if (!config.enableDiscordBot) {
+  console.log(chalk.green(chalk.yellow('\n[BOT START]') + ' I\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.updateIntervalSeconds) + ' seconds...\n'));
+}
 
 
 
