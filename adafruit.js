@@ -55,10 +55,10 @@ let twoGigActive           = false;
 let fourGigActive          = false;
 let eightGigActive         = false;
 
-// flag indicating if the bot is currently suspended from making queries to Adafruit.com (sleep mode to not query outside of their hours)
+// flag indicating if the bot is currently suspended from making queries to Adafruit.com (sleep mode to not query outside of their restock hours)
 let sleepModeActive        = false;
 
-// check that at least one bot is enabled and yell at the user if not
+// check that at least one bot is enabled and complain to the user if not
 if (!config.enableDiscordBot && !config.enableSlackBot) {
   console.log(chalk.red('\n[ERROR]') + ' At least one bot must be enabled in config.json. Please enable the bot(s) you want to use and ensure they are configured properly. Exiting...');
   console.log(chalk.yellow('See the README.md for more information if you need help.\n'));
@@ -87,7 +87,7 @@ if (!config.enableDiscordBot) {
 // -------------------------------------------
 
 // runs once the discord bot has logged in and is ready to send messages
-// this is when we want to do our discord setup tasks and make our first stock status check
+// this is when we want to do our discord setup tasks and make an initial stock status check
 
 client.on('ready', () => {
   console.log(chalk.greenBright(`Logged in as ${client.user.tag} in ${client.guilds.cache.size} servers while using ${clientShardHelper.count} shard(s)!`));
@@ -99,6 +99,9 @@ client.on('ready', () => {
   }
   catch (err) {
     console.error(chalk.red(`Error looking up guild with provided ID ${config.discordServerID}\n:`), err);
+    // since the guild wasn't found, we need to exit here because the rest of the discord abilities will not work and simply crash the bot when they get called
+    // the user needs to either fix the configured ID, or disable the discord bot
+    process.exit(1);
   }
   // verify and set up the configured discord server if it's not already set up
   setupDiscordServer();
@@ -137,18 +140,18 @@ function checkStockStatus() {
     }
   }
 
-  // proceed to make status query if sleep mode is not currently active or if it's not enabled
+  // proceed to make a query to the Pi 4 product page and download the source HTML
   axios.get('https://www.adafruit.com/product/4295')
     .then(function (response) {
-      // on success, parse the HTML response into a DOM object
+      // on success, select the HTML from the response and parse it into a DOM object
       const html = response.data;
       const dom = new JSDOM(html);
 
-      // get all the of the HTML list elements that contain the stock status for each model
+      // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
       const stockList = dom.window.document.querySelector('div.mobile-button-row:nth-child(1) > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
 
       // gather the stock status of each model (represented as a boolean for being in-stock or not)
-      // check if the text doesn't contain the word "Out of Stock" (will be showing the price instead if it's in stock)
+      // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock)
       let oneGigModelInStock = stockList[0].textContent.toLowerCase().indexOf('out of stock') === -1;
       let twoGigModelInStock = stockList[1].textContent.toLowerCase().indexOf('out of stock') === -1;
       let fourGigModelInStock = stockList[2].textContent.toLowerCase().indexOf('out of stock') === -1;
@@ -162,7 +165,7 @@ function checkStockStatus() {
         eightGigModelInStock = adjustedEightGig;
       });
 
-      // send the stock status to discord/slack if any of the models are in stock
+      // send the stock status to discord and/or slack if any of the models are in stock
       if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
         console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
         if (config.enableDiscordBot) {
@@ -371,8 +374,9 @@ function setupDiscordServer() {
 //------------------------------------------
 //------------------------------------------
 
-// check these new statuses against the old ones to see if any any have come in stock that weren't previously
-// this is so we don't send another notification for a model that has already had a notification sent for it
+// check new statuses against the old cached ones to see if any models have come in stock that weren't previously
+// this is done so we don't send another notification for a model that has already had a notification sent for it
+// the active status flags get reset when the models go out of stock again so that the next restock will be captured
 
 function checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, cb) {
   // first, ignore if in stock but has already had notification sent (active)
@@ -427,4 +431,6 @@ function checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelIn
 }
 
 
+//
 // welcome to the end, want a cookie?  ༼ つ ◕_◕ ༽つ🍪
+//
