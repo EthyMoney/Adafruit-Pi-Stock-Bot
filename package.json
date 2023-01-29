@@ -3,6 +3,7 @@
   "version": "1.1.1",
   "description": "A simple Discord and Slack bot that that checks the stock status of all of the Raspberry Pi 4 models on Adafruit and sends a message to a Discord channel or Slack workspace when one is in stock.",
   "main": "adafruit.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node adafruit.js"
@@ -12,8 +13,8 @@
     "url": "git+https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot.git"
   },
   "engines": {
-    "node": ">=16.15.1",
-    "npm": ">=8.13.1"
+    "node": ">=18.12.1",
+    "npm": ">=9.1.0"
   },
   "keywords": [
     "bot",
@@ -31,12 +32,12 @@
   },
   "homepage": "https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot#readme",
   "devDependencies": {
-    "eslint": "^8.20.0"
+    "eslint": "^8.33.0"
   },
   "dependencies": {
-    "axios": "^0.27.2",
-    "chalk": "^4.1.2",
-    "discord.js": "^13.9.0",
-    "jsdom": "^20.0.0"
+    "axios": "^1.2.6",
+    "chalk": "^5.2.0",
+    "discord.js": "^14.7.1",
+    "jsdom": "^21.1.0"
   }
 }

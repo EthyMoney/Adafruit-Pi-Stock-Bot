@@ -38,13 +38,12 @@
 // -------------------------------------------
 // -------------------------------------------
 
-const { MessageEmbed, Client, Intents, ShardClientUtil, Permissions } = require('discord.js');
-const client               = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES], shards: 'auto' });
-const axios                = require('axios').default;
-const jsdom                = require('jsdom');
-const chalk                = require('chalk');
-const fs                   = require('fs');
-const { JSDOM }            = jsdom;
+import { Client, GatewayIntentBits, ShardClientUtil, EmbedBuilder } from 'discord.js';
+const client               = new Client({ intents: [GatewayIntentBits.Guilds] });
+import axios               from 'axios';
+import { JSDOM }           from 'jsdom';
+import chalk               from 'chalk';
+import fs                  from 'fs';
 const clientShardHelper    = new ShardClientUtil(client);
 const config               = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
@@ -196,10 +195,10 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
   const channelsCache = configuredGuild.channels.cache;
 
   // create the template embed to send to discord
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
+    .setColor('#00ff00')
     .setTitle('Adafruit Raspberry Pi 4 IN STOCK!')
     .setDescription('The following models are in stock:\n')
-    .setColor('#00ff00')
     .setThumbnail('https://cdn-shop.adafruit.com/970x728/4292-06.jpg')
     .setTimestamp()
     .setFooter({
@@ -209,28 +208,28 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
 
   // populate stock fields for all in-stock models where notification is enabled in the config
   if (oneGigModelInStock && config.watch1GigModel) {
-    embed.addField('1GB Model', '[BUY IT!](https://www.adafruit.com/product/4295)', true);
+    embed.addFields({ name: '1GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4295)', inline: true })
     const oneGigRole = rolesCache.find(role => role.name === 'Pi4 1GB');
     mentionRolesMessage += (oneGigRole) ? ` ${oneGigRole} ` : console.error(chalk.red('No 1GB role found!'));
   }
   if (twoGigModelInStock && config.watch2GigModel) {
-    embed.addField('2GB Model', '[BUY IT!](https://www.adafruit.com/product/4292)', true);
+    embed.addFields({ name: '2GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4292)', inline: true })
     const twoGigRole = rolesCache.find(role => role.name === 'Pi4 2GB');
     mentionRolesMessage += (twoGigRole) ? ` ${twoGigRole} ` : console.error(chalk.red('No 2GB role found!'));
   }
   if (fourGigModelInStock && config.watch4GigModel) {
-    embed.addField('4GB Model', '[BUY IT!](https://www.adafruit.com/product/4296)', true);
+    embed.addFields({ name: '4GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4296)', inline: true })
     const fourGigRole = rolesCache.find(role => role.name === 'Pi4 4GB');
     mentionRolesMessage += (fourGigRole) ? ` ${fourGigRole} ` : console.error(chalk.red('No 4GB role found!'));
   }
   if (eightGigModelInStock && config.watch8GigModel) {
-    embed.addField('8GB Model', '[BUY IT!](https://www.adafruit.com/product/4564)', true);
+    embed.addFields({ name: '8GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4564)', inline: true })
     const eightGigRole = rolesCache.find(role => role.name === 'Pi4 8GB');
     mentionRolesMessage += (eightGigRole) ? ` ${eightGigRole} ` : console.error(chalk.red('No 8GB role found!'));
   }
 
   // lookup the configured discord TEXT channel by name and send the embed out to the channel
-  const channel = channelsCache.find(channel => channel.name === config.discordChannelName.toString() && channel.type == 'GUILD_TEXT');
+  const channel = channelsCache.find(channel => channel.name === config.discordChannelName.toString() && channel.type === 0);
 
   // if the channel was found, send the embed and mention messages
   if (channel) {
