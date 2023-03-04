@@ -38,7 +38,7 @@
 // -------------------------------------------
 // -------------------------------------------
 
-import { Client, GatewayIntentBits, ShardClientUtil, EmbedBuilder } from 'discord.js';
+import { Client, GatewayIntentBits, ShardClientUtil, EmbedBuilder, ChannelType, PermissionFlagsBits, Colors } from 'discord.js';
 const client               = new Client({ intents: [GatewayIntentBits.Guilds] });
 import axios               from 'axios';
 import { JSDOM }           from 'jsdom';
@@ -325,15 +325,19 @@ async function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelI
 function setupDiscordServer() {
   // first, define the roles we need in the server based on the config (in RGB cus we're real gamers here)
   const roles = [];
-  if (config.watch1GigModel) roles.push({ name: 'Pi4 1GB', color: 'RED' });
-  if (config.watch2GigModel) roles.push({ name: 'Pi4 2GB', color: 'GREEN' });
-  if (config.watch4GigModel) roles.push({ name: 'Pi4 4GB', color: 'BLUE' });
-  if (config.watch8GigModel) roles.push({ name: 'Pi4 8GB', color: 'PURPLE' });
+  if (config.watch1GigModel) roles.push({ name: 'Pi4 1GB', color: Colors.Red });
+  if (config.watch2GigModel) roles.push({ name: 'Pi4 2GB', color: Colors.Green });
+  if (config.watch4GigModel) roles.push({ name: 'Pi4 4GB', color: Colors.Blue });
+  if (config.watch8GigModel) roles.push({ name: 'Pi4 8GB', color: Colors.Purple });
 
   // create the roles in the server if they don't exist yet
   roles.forEach(role => {
     if (!configuredGuild.roles.cache.find(r => r.name == role.name)) {
-      configuredGuild.roles.create({ name: role.name, color: role.color })
+      configuredGuild.roles.create({
+        name: role.name,
+        color: role.color,
+        reason: 'Auto-created by Pi4 Stock Bot for stock notifications',
+      })
         .then(role => {
           console.log(chalk.green(`Created role: ${role.name}`));
         })
@@ -344,12 +348,14 @@ function setupDiscordServer() {
   });
   // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
   if (!configuredGuild.channels.cache.find(c => c.name == config.discordChannelName)) {
-    configuredGuild.channels.create('pi4-stock-notifications', {
-      type: 'GUILD_TEXT',
+    configuredGuild.channels.create({
+      name: 'pi4-stock-notifications',
+      type: ChannelType.GuildText,
+      reason: 'Auto-created by Pi4 Stock Bot for stock notifications',
       permissionOverwrites: [
         {
           id: client.user.id,
-          allow: [Permissions.FLAGS.EMBED_LINKS, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL]
+          allow: [PermissionFlagsBits.EmbedLinks, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
         },
       ],
     })
