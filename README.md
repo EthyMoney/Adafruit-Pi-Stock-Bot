@@ -7,7 +7,7 @@
   <a href="">[![Made For - Discord](https://img.shields.io/static/v1?label=Made+For&message=Discord&color=%235865F2&logo=discord)](https://discord.com/)</a>
   <a href="">[![Made For - Slack](https://img.shields.io/static/v1?label=Made+For&message=Slack&color=%234A154B&logo=slack&logoColor=%23E01E5A)](https://slack.com/)</a>
   <a href="">[![Node.js - >=18.12.1](https://img.shields.io/badge/Node.js->=18.12.1-brightgreen?logo=node.js)](https://nodejs.org/en/)</a>
-  <a href="">[![Discord.js - 14.7.1](https://img.shields.io/badge/Discord.js-14.7.1-blue?logo=discord&logoColor=https%3A%2F%2Fdiscord.js.org%2F%23%2F)](https://discord.js.org/)</a>
+  <a href="">[![Discord.js - 14.8.0](https://img.shields.io/badge/Discord.js-14.8.0-blue?logo=discord&logoColor=https%3A%2F%2Fdiscord.js.org%2F%23%2F)](https://discord.js.org/)</a>
   
 </div>
 
