@@ -1,6 +1,6 @@
 <div align="center">
   
-# Adafruit Pi4 Stock Alert Bot &nbsp;&nbsp;
+# Adafruit Pi4 Stock Alert Bot
   <a href="">[![GitHub tag](https://img.shields.io/github/tag/EthyMoney/Adafruit-Pi4-Stock-Bot?include_prereleases=&sort=semver&color=blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/releases/)</a>
   <a href="">[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/blob/main/LICENSE)</a>
   <a href="">[![issues - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/issues/EthyMoney/Adafruit-Pi4-Stock-Bot)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/issues)</a>
@@ -19,7 +19,13 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
 </p>
-<br><br>
+<br>
+
+<div align="center">
+
+<a href="https://www.digitalocean.com/?refcode=5c02403910e5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg" alt="DigitalOcean Referral Badge" width="20%" height="auto"/></a>
+
+</div>
 
 ## What This Is
 A simple Discord and/or Slack bot that checks the stock status of all the Raspberry Pi 4 (model B) models on Adafruit and sends a message to a Discord/Slack channel when one is in stock. This bot is designed to be self-hosted and run for use in your own Discord server or Slack workspace.
