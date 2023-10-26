@@ -63,21 +63,21 @@ let pi5EightGigActive = false;
 let sleepModeActive = false;
 
 // check that at least one bot is enabled and complain to the user if not
-if (!config.enableDiscordBot && !config.enableSlackBot) {
+if (!config.discord.enableBot && !config.slack.enableBot) {
   console.log(chalk.red('\n[ERROR]') + ' At least one bot must be enabled in config.json. Please enable the bot(s) you want to use and ensure they are configured properly. Exiting...');
   console.log(chalk.yellow('See the README.md for more information if you need help.\n'));
   process.exit(1);
 }
 
 // connect to discord (if discord bot is enabled)
-if (config.enableDiscordBot) client.login(config.discordBotToken);
+if (config.discord.enableBot) client.login(config.discord.token);
 
 // schedule the stock status update to be called at the specified interval
-setInterval(() => { checkStockStatus(); }, config.updateIntervalSeconds * 1000);
+setInterval(() => { checkStockStatus(); }, config.generalSettings.updateIntervalSeconds * 1000);
 
 // show a startup message so the user knows the bot is running (if only using the Slack bot)
-if (!config.enableDiscordBot) {
-  console.log(chalk.green(chalk.yellow('\n[BOT START]') + ' I\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.updateIntervalSeconds) + ' seconds...\n'));
+if (!config.discord.enableBot) {
+  console.log(chalk.green(chalk.yellow('\n[BOT START]') + ' I\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.generalSettings.updateIntervalSeconds) + ' seconds...\n'));
 }
 
 
@@ -99,10 +99,10 @@ client.on('ready', () => {
   client.user.setActivity('for Pis!', { type: 'WATCHING' });
   // get the discord guild to send the stock status to
   try {
-    configuredGuild = client.guilds.cache.get(config.discordServerID);
+    configuredGuild = client.guilds.cache.get(config.discord.serverID);
   }
   catch (err) {
-    console.error(chalk.red(`Error looking up guild with provided ID ${config.discordServerID}\n:`), err);
+    console.error(chalk.red(`Error looking up guild with provided ID ${config.discord.serverID}\n:`), err);
     // since the guild wasn't found, we need to exit here because the rest of the discord abilities will not work and simply crash the bot when they get called
     // the user needs to either fix the configured ID, or disable the discord bot
     process.exit(1);
@@ -128,7 +128,7 @@ client.on('ready', () => {
 function checkStockStatus() {
   // if sleep mode is enabled in config.json, this will only check stock status between 6am to 8pm (CDT) (11am to 1am UTC)
   // the website is only likely to be updated between these times so we don't need to spam Adafruit's servers overnight
-  if (config.enableSleepMode) {
+  if (config.generalSettings.enableSleepMode) {
     const currentTime = new Date();
     const currentHourUTC = currentTime.getUTCHours();
     if (currentHourUTC >= 1 && currentHourUTC < 11) {
@@ -156,27 +156,27 @@ function checkStockStatus() {
 
       // gather the stock status of each model (represented as a boolean for being in-stock or not)
       // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock)
-      let oneGigModelInStock = stockList[0].textContent.toLowerCase().indexOf('out of stock') === -1;
-      let twoGigModelInStock = stockList[1].textContent.toLowerCase().indexOf('out of stock') === -1;
-      let fourGigModelInStock = stockList[2].textContent.toLowerCase().indexOf('out of stock') === -1;
-      let eightGigModelInStock = stockList[3].textContent.toLowerCase().indexOf('out of stock') === -1;
+      let pi4ModelBOneGigModelInStock = stockList[0].textContent.toLowerCase().indexOf('out of stock') === -1;
+      let pi4ModelBTwoGigModelInStock = stockList[1].textContent.toLowerCase().indexOf('out of stock') === -1;
+      let pi4ModelBFourGigModelInStock = stockList[2].textContent.toLowerCase().indexOf('out of stock') === -1;
+      let pi4ModelBEightGigModelInStock = stockList[3].textContent.toLowerCase().indexOf('out of stock') === -1;
 
       // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
-      checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, (adjustedOneGig, adjustedTwoGig, adjustedFourGig, adjustedEightGig) => {
-        oneGigModelInStock = adjustedOneGig;
-        twoGigModelInStock = adjustedTwoGig;
-        fourGigModelInStock = adjustedFourGig;
-        eightGigModelInStock = adjustedEightGig;
+      checkForNewStock(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock, (adjustedOneGig, adjustedTwoGig, adjustedFourGig, adjustedEightGig) => {
+        pi4ModelBOneGigModelInStock = adjustedOneGig;
+        pi4ModelBTwoGigModelInStock = adjustedTwoGig;
+        pi4ModelBFourGigModelInStock = adjustedFourGig;
+        pi4ModelBEightGigModelInStock = adjustedEightGig;
       });
 
       // send the stock status to discord and/or slack if any of the models are in stock
-      if (oneGigModelInStock || twoGigModelInStock || fourGigModelInStock || eightGigModelInStock) {
-        console.log(chalk.yellowBright(`WE GOT STOCK! : ${oneGigModelInStock ? '1GB' : ''} ${twoGigModelInStock ? '2GB' : ''} ${fourGigModelInStock ? '4GB' : ''} ${eightGigModelInStock ? '8GB' : ''}`));
-        if (config.enableDiscordBot) {
-          sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
+      if (pi4ModelBOneGigModelInStock || pi4ModelBTwoGigModelInStock || pi4ModelBFourGigModelInStock || pi4ModelBEightGigModelInStock) {
+        console.log(chalk.yellowBright(`WE GOT STOCK! : ${pi4ModelBOneGigModelInStock ? '1GB' : ''} ${pi4ModelBTwoGigModelInStock ? '2GB' : ''} ${pi4ModelBFourGigModelInStock ? '4GB' : ''} ${pi4ModelBEightGigModelInStock ? '8GB' : ''}`));
+        if (config.discord.enableBot) {
+          sendToDiscord(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock);
         }
-        if (config.enableSlackBot) {
-          sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
+        if (config.slack.enableBot) {
+          sendToSlack(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock);
         }
       }
     })
@@ -192,7 +192,7 @@ function checkStockStatus() {
 // this function handles verifying the servers, channels, and roles for discord, then sending the actual notification message out
 // this will send *one* notification message embed that contains all models that are in stock, rather than separate messages for each model (like the slack function does)
 
-function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
+function sendToDiscord(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock) {
   console.log(chalk.greenBright('Sending stock status to Discord...'));
   let mentionRolesMessage = ''; // will be populated with the roles to mention based on status of each model
   // grab the roles and channels cache from the configured guild
@@ -212,29 +212,29 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
     });
 
   // populate stock fields for all in-stock models where notification is enabled in the config
-  if (oneGigModelInStock && config.watch1GigModel) {
+  if (pi4ModelBOneGigModelInStock && config.modelsSelection.pi4_modelB_1GB) {
     embed.addFields({ name: '1GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4295)', inline: true })
     const oneGigRole = rolesCache.find(role => role.name === 'Pi4 1GB');
     mentionRolesMessage += (oneGigRole) ? ` ${oneGigRole} ` : console.error(chalk.red('No 1GB role found!'));
   }
-  if (twoGigModelInStock && config.watch2GigModel) {
+  if (pi4ModelBTwoGigModelInStock && config.modelsSelection.pi4_modelB_2GB) {
     embed.addFields({ name: '2GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4292)', inline: true })
     const twoGigRole = rolesCache.find(role => role.name === 'Pi4 2GB');
     mentionRolesMessage += (twoGigRole) ? ` ${twoGigRole} ` : console.error(chalk.red('No 2GB role found!'));
   }
-  if (fourGigModelInStock && config.watch4GigModel) {
+  if (pi4ModelBFourGigModelInStock && config.modelsSelection.pi4_modelB_4GB) {
     embed.addFields({ name: '4GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4296)', inline: true })
     const fourGigRole = rolesCache.find(role => role.name === 'Pi4 4GB');
     mentionRolesMessage += (fourGigRole) ? ` ${fourGigRole} ` : console.error(chalk.red('No 4GB role found!'));
   }
-  if (eightGigModelInStock && config.watch8GigModel) {
+  if (pi4ModelBEightGigModelInStock && config.modelsSelection.pi4_modelB_8GB) {
     embed.addFields({ name: '8GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4564)', inline: true })
     const eightGigRole = rolesCache.find(role => role.name === 'Pi4 8GB');
     mentionRolesMessage += (eightGigRole) ? ` ${eightGigRole} ` : console.error(chalk.red('No 8GB role found!'));
   }
 
   // lookup the configured discord TEXT channel by name and send the embed out to the channel
-  const channel = channelsCache.find(channel => channel.name === config.discordChannelName.toString() && channel.type === 0);
+  const channel = channelsCache.find(channel => channel.name === config.discord.channelName.toString() && channel.type === 0);
 
   // if the channel was found, send the embed and mention messages
   if (channel) {
@@ -258,7 +258,7 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
     }
   }
   else {
-    console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discordChannelName + '"')), chalk.yellow('Did you delete/rename it? Can I see it? Check your config!'));
+    console.error(chalk.red('No text channel found in server with name: ' + chalk.cyan('"' + config.discord.channelName + '"')), chalk.yellow('Did you delete/rename it? Can I see it? Check your config!'));
   }
 }
 
@@ -269,31 +269,31 @@ function sendToDiscord(oneGigModelInStock, twoGigModelInStock, fourGigModelInSto
 // function to send stock statuses to Slack for models that are in stock
 // this will send each model in stock as separate notification messages if multiple models are in stock at once
 
-async function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock) {
+async function sendToSlack(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock) {
   console.log(chalk.greenBright('Sending stock status to Slack...'));
   const url = 'https://slack.com/api/chat.postMessage';
-  const authorizationHeader = { headers: { authorization: `Bearer ${config.slackBotToken}` } };
-  if (oneGigModelInStock && config.watch1GigModel) {
-    const channel = config.slackChannel1GB;
-    const username = 'PI4 1GB IN STOCK';
+  const authorizationHeader = { headers: { authorization: `Bearer ${config.slack.token}` } };
+  if (pi4ModelBOneGigModelInStock && config.modelsSelection.pi4_modelB_1GB) {
+    const channel = config.slack.channel_pi4_modelB_1GB;
+    const username = 'PI4 Model B 1GB IN STOCK';
     const messageText = '@channel The 1GB model is in stock on Adafruit! <https://www.adafruit.com/product/4295|BUY IT>';
     postMessage(channel, username, messageText, '1GB');
   }
-  if (twoGigModelInStock && config.watch2GigModel) {
-    const channel = config.slackChannel2GB;
-    const username = 'PI4 2GB IN STOCK';
+  if (pi4ModelBTwoGigModelInStock && config.modelsSelection.pi4_modelB_2GB) {
+    const channel = config.slack.channel_pi4_modelB_2GB;
+    const username = 'PI4 Model B 2GB IN STOCK';
     const messageText = '@channel The 2GB model is in stock on Adafruit! <https://www.adafruit.com/product/4292|BUY IT>';
     postMessage(channel, username, messageText, '2GB');
   }
-  if (fourGigModelInStock && config.watch4GigModel) {
-    const channel = config.slackChannel4GB;
-    const username = 'PI4 4GB IN STOCK';
+  if (pi4ModelBFourGigModelInStock && config.modelsSelection.pi4_modelB_4GB) {
+    const channel = config.slack.channel_pi4_modelB_4GB;
+    const username = 'PI4 Model B 4GB IN STOCK';
     const messageText = '@channel The 4GB model is in stock on Adafruit! <https://www.adafruit.com/product/4296|BUY IT>';
     postMessage(channel, username, messageText, '4GB');
   }
-  if (eightGigModelInStock && config.watch8GigModel) {
-    const channel = config.slackChannel8GB;
-    const username = 'PI4 8GB IN STOCK';
+  if (pi4ModelBEightGigModelInStock && config.modelsSelection.pi4_modelB_8GB) {
+    const channel = config.slack.channel_pi4_modelB_8GB;
+    const username = 'PI4 Model B 8GB IN STOCK';
     const messageText = '@channel The 8GB model is in stock on Adafruit! <https://www.adafruit.com/product/4564|BUY IT>';
     postMessage(channel, username, messageText, '8GB');
   }
@@ -330,10 +330,10 @@ async function sendToSlack(oneGigModelInStock, twoGigModelInStock, fourGigModelI
 function setupDiscordServer() {
   // first, define the roles we need in the server based on the config (in RGB cus we're real gamers here)
   const roles = [];
-  if (config.watch1GigModel) roles.push({ name: 'Pi4 1GB', color: Colors.Red });
-  if (config.watch2GigModel) roles.push({ name: 'Pi4 2GB', color: Colors.Green });
-  if (config.watch4GigModel) roles.push({ name: 'Pi4 4GB', color: Colors.Blue });
-  if (config.watch8GigModel) roles.push({ name: 'Pi4 8GB', color: Colors.Purple });
+  if (config.modelsSelection.pi4_modelB_1GB) roles.push({ name: 'Pi4 1GB', color: Colors.Red });
+  if (config.modelsSelection.pi4_modelB_2GB) roles.push({ name: 'Pi4 2GB', color: Colors.Green });
+  if (config.modelsSelection.pi4_modelB_4GB) roles.push({ name: 'Pi4 4GB', color: Colors.Blue });
+  if (config.modelsSelection.pi4_modelB_8GB) roles.push({ name: 'Pi4 8GB', color: Colors.Purple });
 
   // create the roles in the server if they don't exist yet
   roles.forEach(role => {
@@ -352,7 +352,7 @@ function setupDiscordServer() {
     }
   });
   // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
-  if (!configuredGuild.channels.cache.find(c => c.name == config.discordChannelName)) {
+  if (!configuredGuild.channels.cache.find(c => c.name == config.discord.channelName)) {
     configuredGuild.channels.create({
       name: 'pi4-stock-notifications',
       type: ChannelType.GuildText,
@@ -366,7 +366,7 @@ function setupDiscordServer() {
     })
       .then(channel => {
         // set the notification channel in the config to be this new one (so it can be used in the future)
-        config.discordChannelName = 'pi4-stock-notifications';
+        config.discord.channelName = 'pi4-stock-notifications';
         fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
         console.log(chalk.green('You didn\'t provide a channel name or it wasn\'t able to be found in the server, so I created one for you!'));
         console.log(chalk.green(`The new channel is named: ${chalk.cyan(channel.name)}`));
@@ -377,7 +377,7 @@ function setupDiscordServer() {
       });
   }
   console.log(chalk.greenBright(`Discord server setup complete for ${chalk.cyan(configuredGuild.name)}  Lets go! ⚡⚡⚡`));
-  console.log(chalk.green('\nI\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.updateIntervalSeconds) + ' seconds...\n'));
+  console.log(chalk.green('\nI\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.generalSettings.updateIntervalSeconds) + ' seconds...\n'));
 }
 
 
@@ -388,56 +388,56 @@ function setupDiscordServer() {
 // this is done so we don't send another notification for a model that has already had a notification sent for it
 // the active status flags get reset when the models go out of stock again so that the next restock will be captured
 
-function checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, cb) {
+function checkForNewStock(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock, cb) {
   // first, ignore if in stock but has already had notification sent (active)
-  if (oneGigModelInStock && pi4ModelBOneGigActive) {
-    oneGigModelInStock = false;
+  if (pi4ModelBOneGigModelInStock && pi4ModelBOneGigActive) {
+    pi4ModelBOneGigModelInStock = false;
   }
   else {
     // in stock and wasn't previously, send a notification and update the active status flag
-    if (oneGigModelInStock && !pi4ModelBOneGigActive) {
+    if (pi4ModelBOneGigModelInStock && !pi4ModelBOneGigActive) {
       pi4ModelBOneGigActive = true;
     }
-    if (!oneGigModelInStock && pi4ModelBOneGigActive) {
+    if (!pi4ModelBOneGigModelInStock && pi4ModelBOneGigActive) {
       pi4ModelBOneGigActive = false;
     }
   }
-  if (twoGigModelInStock && pi4ModelBTwoGigActive) {
-    twoGigModelInStock = false;
+  if (pi4ModelBTwoGigModelInStock && pi4ModelBTwoGigActive) {
+    pi4ModelBTwoGigModelInStock = false;
   }
   else {
-    if (twoGigModelInStock && !pi4ModelBTwoGigActive) {
+    if (pi4ModelBTwoGigModelInStock && !pi4ModelBTwoGigActive) {
       pi4ModelBTwoGigActive = true;
     }
-    if (!twoGigModelInStock && pi4ModelBTwoGigActive) {
+    if (!pi4ModelBTwoGigModelInStock && pi4ModelBTwoGigActive) {
       pi4ModelBTwoGigActive = false;
     }
   }
-  if (fourGigModelInStock && pi4ModelBFourGigActive) {
-    fourGigModelInStock = false;
+  if (pi4ModelBFourGigModelInStock && pi4ModelBFourGigActive) {
+    pi4ModelBFourGigModelInStock = false;
   }
   else {
-    if (fourGigModelInStock && !pi4ModelBFourGigActive) {
+    if (pi4ModelBFourGigModelInStock && !pi4ModelBFourGigActive) {
       pi4ModelBFourGigActive = true;
     }
-    if (!fourGigModelInStock && pi4ModelBFourGigActive) {
+    if (!pi4ModelBFourGigModelInStock && pi4ModelBFourGigActive) {
       pi4ModelBFourGigActive = false;
     }
   }
-  if (eightGigModelInStock && pi4ModelBEightGigActive) {
-    eightGigModelInStock = false;
+  if (pi4ModelBEightGigModelInStock && pi4ModelBEightGigActive) {
+    pi4ModelBEightGigModelInStock = false;
   }
   else {
-    if (eightGigModelInStock && !pi4ModelBEightGigActive) {
+    if (pi4ModelBEightGigModelInStock && !pi4ModelBEightGigActive) {
       pi4ModelBEightGigActive = true;
     }
-    if (!eightGigModelInStock && pi4ModelBEightGigActive) {
+    if (!pi4ModelBEightGigModelInStock && pi4ModelBEightGigActive) {
       pi4ModelBEightGigActive = false;
     }
   }
 
   // return the updated statuses
-  cb(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock);
+  cb(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock);
 }
 
 
