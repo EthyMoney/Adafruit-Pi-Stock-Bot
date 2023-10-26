@@ -49,6 +49,8 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
 // flags indicating current stock status of each model (used to prevent sending the same in-stock messages multiple times)
+// TODO :make a cache of flags to track the in-stock status of each defined model in the models.json (will be updated on each check)
+
 let pi4ModelBOneGigActive = false;
 let pi4ModelBTwoGigActive = false;
 let pi4ModelBFourGigActive = false;
