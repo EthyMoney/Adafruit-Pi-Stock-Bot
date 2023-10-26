@@ -1,17 +1,17 @@
 /*
  * ------------------------------------------------------------------------
  *
- *      _____ _ _  _      _____ _             _       ____        _   
- *     |  __ (_| || |    / ____| |           | |     |  _ \      | |  
- *     | |__) _| || |_  | (___ | |_ ___   ___| | __  | |_) | ___ | |_ 
- *     |  ___| |__   _|  \___ \| __/ _ \ / __| |/ /  |  _ < / _ \| __|
- *     | |   | |  | |    ____) | || (_) | (__|   <   | |_) | (_) | |_ 
- *     |_|   |_|  |_|   |_____/ \__\___/ \___|_|\_\  |____/ \___/ \__|
+ *       _____ _      _____ _             _        ____        _   
+ *      |  __ (_|    / ____| |           | |      |  _ \      | |  
+ *      | |__) _    | (___ | |_ ___   ___| | __   | |_) | ___ | |_ 
+ *      |  ___| |    \___ \| __/ _ \ / __| |/ /   |  _ < / _ \| __|
+ *      | |   | |    ____) | || (_) | (__|   <    | |_) | (_) | |_ 
+ *      |_|   |_|   |_____/ \__\___/ \___|_|\_\   |____/ \___/ \__|
  *
  *
  *
  * Author:      Logan S. ~ EthyMoney#5000(Discord) ~ EthyMoney(GitHub)
- * Program:     Adafruit Pi4 Stock Bot
+ * Program:     Adafruit Raspberry Pi Stock Bot
  * GitHub:      https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot
  *
  * Discord and Slack bot that sends alerts of stock of the Raspberry Pi 4 on Adafruit.com
@@ -39,23 +39,28 @@
 // -------------------------------------------
 
 import { Client, GatewayIntentBits, ShardClientUtil, EmbedBuilder, ChannelType, PermissionFlagsBits, Colors } from 'discord.js';
-const client               = new Client({ intents: [GatewayIntentBits.Guilds] });
-import axios               from 'axios';
-import { JSDOM }           from 'jsdom';
-import chalk               from 'chalk';
-import fs                  from 'fs';
-const clientShardHelper    = new ShardClientUtil(client);
-const config               = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+import axios from 'axios';
+import { JSDOM } from 'jsdom';
+import chalk from 'chalk';
+import fs from 'fs';
+const clientShardHelper = new ShardClientUtil(client);
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
 // flags indicating current stock status of each model (used to prevent sending the same in-stock messages multiple times)
-let oneGigActive           = false;
-let twoGigActive           = false;
-let fourGigActive          = false;
-let eightGigActive         = false;
+let pi4ModelBOneGigActive = false;
+let pi4ModelBTwoGigActive = false;
+let pi4ModelBFourGigActive = false;
+let pi4ModelBEightGigActive = false;
+let zeroActive = false;
+let zeroWActive = false;
+let zero2WActive = false;
+let pi5FourGigActive = false;
+let pi5EightGigActive = false;
 
 // flag indicating if the bot is currently suspended from making queries to Adafruit.com (sleep mode to not query outside of their restock hours)
-let sleepModeActive        = false;
+let sleepModeActive = false;
 
 // check that at least one bot is enabled and complain to the user if not
 if (!config.enableDiscordBot && !config.enableSlackBot) {
@@ -385,49 +390,49 @@ function setupDiscordServer() {
 
 function checkForNewStock(oneGigModelInStock, twoGigModelInStock, fourGigModelInStock, eightGigModelInStock, cb) {
   // first, ignore if in stock but has already had notification sent (active)
-  if (oneGigModelInStock && oneGigActive) {
+  if (oneGigModelInStock && pi4ModelBOneGigActive) {
     oneGigModelInStock = false;
   }
   else {
     // in stock and wasn't previously, send a notification and update the active status flag
-    if (oneGigModelInStock && !oneGigActive) {
-      oneGigActive = true;
+    if (oneGigModelInStock && !pi4ModelBOneGigActive) {
+      pi4ModelBOneGigActive = true;
     }
-    if (!oneGigModelInStock && oneGigActive) {
-      oneGigActive = false;
+    if (!oneGigModelInStock && pi4ModelBOneGigActive) {
+      pi4ModelBOneGigActive = false;
     }
   }
-  if (twoGigModelInStock && twoGigActive) {
+  if (twoGigModelInStock && pi4ModelBTwoGigActive) {
     twoGigModelInStock = false;
   }
   else {
-    if (twoGigModelInStock && !twoGigActive) {
-      twoGigActive = true;
+    if (twoGigModelInStock && !pi4ModelBTwoGigActive) {
+      pi4ModelBTwoGigActive = true;
     }
-    if (!twoGigModelInStock && twoGigActive) {
-      twoGigActive = false;
+    if (!twoGigModelInStock && pi4ModelBTwoGigActive) {
+      pi4ModelBTwoGigActive = false;
     }
   }
-  if (fourGigModelInStock && fourGigActive) {
+  if (fourGigModelInStock && pi4ModelBFourGigActive) {
     fourGigModelInStock = false;
   }
   else {
-    if (fourGigModelInStock && !fourGigActive) {
-      fourGigActive = true;
+    if (fourGigModelInStock && !pi4ModelBFourGigActive) {
+      pi4ModelBFourGigActive = true;
     }
-    if (!fourGigModelInStock && fourGigActive) {
-      fourGigActive = false;
+    if (!fourGigModelInStock && pi4ModelBFourGigActive) {
+      pi4ModelBFourGigActive = false;
     }
   }
-  if (eightGigModelInStock && eightGigActive) {
+  if (eightGigModelInStock && pi4ModelBEightGigActive) {
     eightGigModelInStock = false;
   }
   else {
-    if (eightGigModelInStock && !eightGigActive) {
-      eightGigActive = true;
+    if (eightGigModelInStock && !pi4ModelBEightGigActive) {
+      pi4ModelBEightGigActive = true;
     }
-    if (!eightGigModelInStock && eightGigActive) {
-      eightGigActive = false;
+    if (!eightGigModelInStock && pi4ModelBEightGigActive) {
+      pi4ModelBEightGigActive = false;
     }
   }
 
