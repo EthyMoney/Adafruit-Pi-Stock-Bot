@@ -9,5 +9,93 @@
     "discordTitle": "Adafruit Raspberry Pi 4 IN STOCK!",
     "discordRole": "Pi4B 1GB",
     "discordRoleColor": "Red"
+  },
+  "pi4_modelB_2GB": {
+    "name": "Raspberry Pi 4 Model B 2GB",
+    "url": "https://www.adafruit.com/product/4296",
+    "image": "https://cdn-shop.adafruit.com/970x728/4292-05.jpg",
+    "botShortName": "Pi 4 Model B 2GB",
+    "slackMessage": "@channel The 2GB model is in stock on Adafruit!",
+    "discordFieldName": "Pi 4 Model B 2GB",
+    "discordTitle": "Adafruit Raspberry Pi 4 IN STOCK!",
+    "discordRole": "Pi4B 2GB",
+    "discordRoleColor": "Red"
+  },
+  "pi4_modelB_4GB": {
+    "name": "Raspberry Pi 4 Model B 4GB",
+    "url": "https://www.adafruit.com/product/4297",
+    "image": "https://cdn-shop.adafruit.com/970x728/4292-04.jpg",
+    "botShortName": "Pi 4 Model B 4GB",
+    "slackMessage": "@channel The 4GB model is in stock on Adafruit!",
+    "discordFieldName": "Pi 4 Model B 4GB",
+    "discordTitle": "Adafruit Raspberry Pi 4 IN STOCK!",
+    "discordRole": "Pi4B 4GB",
+    "discordRoleColor": "Red"
+  },
+  "pi4_modelB_8GB": {
+    "name": "Raspberry Pi 4 Model B 8GB",
+    "url": "https://www.adafruit.com/product/4564",
+    "image": "https://cdn-shop.adafruit.com/970x728/4564-01.jpg",
+    "botShortName": "Pi 4 Model B 8GB",
+    "slackMessage": "@channel The 8GB model is in stock on Adafruit!",
+    "discordFieldName": "Pi 4 Model B 8GB",
+    "discordTitle": "Adafruit Raspberry Pi 4 IN STOCK!",
+    "discordRole": "Pi4B 8GB",
+    "discordRoleColor": "Red"
+  },
+  "pi_zero": {
+    "name": "Raspberry Pi Zero (v1.3 - non-wireless)",
+    "url": "https://www.adafruit.com/product/2885",
+    "image": "https://cdn-shop.adafruit.com/970x728/2885-00.jpg",
+    "botShortName": "Pi Zero",
+    "slackMessage": "@channel The Pi Zero is in stock on Adafruit!",
+    "discordFieldName": "Pi Zero",
+    "discordTitle": "Adafruit Raspberry Pi Zero IN STOCK!",
+    "discordRole": "PiZero",
+    "discordRoleColor": "Red"
+  },
+  "pi_zero_w": {
+    "name": "Raspberry Pi Zero W",
+    "url": "https://www.adafruit.com/product/3400",
+    "image": "https://cdn-shop.adafruit.com/970x728/3400-00.jpg",
+    "botShortName": "Pi Zero W",
+    "slackMessage": "@channel The Pi Zero W is in stock on Adafruit!",
+    "discordFieldName": "Pi Zero W",
+    "discordTitle": "Adafruit Raspberry Pi Zero W IN STOCK!",
+    "discordRole": "PiZeroW",
+    "discordRoleColor": "Red"
+  },
+  "pi_zero_2w": {
+    "name": "Raspberry Pi Zero 2 W",
+    "url": "https://www.adafruit.com/product/4875",
+    "image": "https://cdn-shop.adafruit.com/970x728/4875-00.jpg",
+    "botShortName": "Pi Zero 2 W",
+    "slackMessage": "@channel The Pi Zero 2 W is in stock on Adafruit!",
+    "discordFieldName": "Pi Zero 2 W",
+    "discordTitle": "Adafruit Raspberry Pi Zero 2 W IN STOCK!",
+    "discordRole": "PiZero2W",
+    "discordRoleColor": "Red"
+  },
+  "pi5_4GB": {
+    "name": "Raspberry Pi 5 4GB",
+    "url": "https://www.adafruit.com/product/4876",
+    "image": "https://cdn-shop.adafruit.com/970x728/4876-00.jpg",
+    "botShortName": "Pi 5 4GB",
+    "slackMessage": "@channel The Pi 5 4GB is in stock on Adafruit!",
+    "discordFieldName": "Pi 5 4GB",
+    "discordTitle": "Adafruit Raspberry Pi 5 4GB IN STOCK!",
+    "discordRole": "Pi5 4GB",
+    "discordRoleColor": "Red"
+  },
+  "pi5_8GB": {
+    "name": "Raspberry Pi 5 8GB",
+    "url": "https://www.adafruit.com/product/4876",
+    "image": "https://cdn-shop.adafruit.com/970x728/4876-00.jpg",
+    "botShortName": "Pi 5 8GB",
+    "slackMessage": "@channel The Pi 5 8GB is in stock on Adafruit!",
+    "discordFieldName": "Pi 5 8GB",
+    "discordTitle": "Adafruit Raspberry Pi 5 8GB IN STOCK!",
+    "discordRole": "Pi5 8GB",
+    "discordRoleColor": "Red"
   }
 }
