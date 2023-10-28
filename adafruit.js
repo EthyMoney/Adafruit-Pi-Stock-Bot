@@ -1,12 +1,12 @@
 /*
  * ------------------------------------------------------------------------
  *
- *       _____ _      _____ _             _        ____        _   
- *      |  __ (_|    / ____| |           | |      |  _ \      | |  
- *      | |__) _    | (___ | |_ ___   ___| | __   | |_) | ___ | |_ 
- *      |  ___| |    \___ \| __/ _ \ / __| |/ /   |  _ < / _ \| __|
- *      | |   | |    ____) | || (_) | (__|   <    | |_) | (_) | |_ 
- *      |_|   |_|   |_____/ \__\___/ \___|_|\_\   |____/ \___/ \__|
+ *        _____ _      _____ _             _        ____        _   
+ *       |  __ (_|    / ____| |           | |      |  _ \      | |  
+ *       | |__) _    | (___ | |_ ___   ___| | __   | |_) | ___ | |_ 
+ *       |  ___| |    \___ \| __/ _ \ / __| |/ /   |  _ < / _ \| __|      
+ *       | |   | |    ____) | || (_) | (__|   <    | |_) | (_) | |_ 
+ *       |_|   |_|   |_____/ \__\___/ \___|_|\_\   |____/ \___/ \__|
  *
  *
  *
@@ -14,7 +14,7 @@
  * Program:     Adafruit Raspberry Pi Stock Bot
  * GitHub:      https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot
  *
- * Discord and Slack bot that sends alerts of stock of the Raspberry Pi 4 on Adafruit.com
+ * Discord and Slack bot that sends stock alerts of Raspberry Pi models on Adafruit.com
  *
  * No parameters on start. Ensure config.json is configured correctly prior to running.
  *
@@ -22,7 +22,7 @@
  * ETH address: 0x169381506870283cbABC52034E4ECc123f3FAD02
  *
  *
- *                        Hello from Minnesota USA!
+ *                        Hello from Minnesota USA!                        
  *                              ⋆⁺₊⋆ ☾ ⋆⁺₊⋆
  *
  * ------------------------------------------------------------------------
@@ -46,20 +46,16 @@ import chalk from 'chalk';
 import fs from 'fs';
 const clientShardHelper = new ShardClientUtil(client);
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+const models = JSON.parse(fs.readFileSync('models.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
 // flags indicating current stock status of each model (used to prevent sending the same in-stock messages multiple times)
-// TODO :make a cache of flags to track the in-stock status of each defined model in the models.json (will be updated on each check)
-
-let pi4ModelBOneGigActive = false;
-let pi4ModelBTwoGigActive = false;
-let pi4ModelBFourGigActive = false;
-let pi4ModelBEightGigActive = false;
-let zeroActive = false;
-let zeroWActive = false;
-let zero2WActive = false;
-let pi5FourGigActive = false;
-let pi5EightGigActive = false;
+// it's automatically generated based on the models.json file
+const stockFlags = Object.keys(models.models).forEach(model => {
+  stockFlags[model] = false;
+  // also add the key name to the models object under the new key "lookupKey" for convenience
+  models.models[model].lookupKey = model;
+});
 
 // flag indicating if the bot is currently suspended from making queries to Adafruit.com (sleep mode to not query outside of their restock hours)
 let sleepModeActive = false;
@@ -146,45 +142,98 @@ function checkStockStatus() {
     }
   }
 
-  // proceed to make a query to the Pi 4 product page and download the source HTML
-  axios.get('https://www.adafruit.com/product/4295')
+  // iterate through all models and for each one that is enabled to check in the config, check the stock status.
+  // all newly in stock models will get reported by the box if there are any that went in stock since the last check and have not been reported yet
+  const modelsGroupedByPages = {};
+  Object.keys(config.modelsSelection).forEach(key => {
+    const model = models.models.find(model => model.configFileName == key);
+    // check if the current model is enabled in the config
+    if (config.modelsSelection[model.configFileName]) {
+      // group the models by their commonProductPageIdentifier property since some will have some in common
+      // add each one with the commonProductPageIdentifier as a key into an array of the model objects
+      if (!modelsGroupedByPages[model.commonProductPageIdentifier]) {
+        modelsGroupedByPages[model.commonProductPageIdentifier] = [model]
+      }
+      else {
+        let temp = modelsGroupedByPages[model.commonProductPageIdentifier]
+        temp.push(model);
+        modelsGroupedByPages[model.commonProductPageIdentifier] = temp;
+      }
+    }
+  })
+
+  // for each common page, make one page request and check the status of each of the models on that page
+  modelsGroupedByPages.forEach(pageGroup => {
+    axios.get(model.url)
+      .then(function (response) {
+        // on successful pull, select the HTML from the response and parse it into a DOM object
+        const html = response.data;
+        const dom = new JSDOM(html);
+
+        // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
+        const stockList = dom.window.document.querySelector('#prod-stock > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
+
+        pageGroup.forEach(model => {
+          // gather the stock status of each model (represented as a boolean for being in-stock or not)
+          // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
+          let modelInStock = stockList[model.commonProductPageCartButtonIndex].textContent.toLowerCase().indexOf('out of stock') === -1;
+
+          // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
+          checkForNewStock(modelInStock, (adjustedStatus) => {
+            stockFlags[findKeyOfObject(models.models, model)] = adjustedStatus;
+          });
+        });
+
+      }).catch(function (error) {
+        console.error(chalk.red('An error occurred during the status refresh:\n'), error);
+      });
+  });
+
+  // we are checking this one, load the product page and check the stock status
+  axios.get(model.url)
     .then(function (response) {
-      // on success, select the HTML from the response and parse it into a DOM object
+      // on successful pull, select the HTML from the response and parse it into a DOM object
       const html = response.data;
       const dom = new JSDOM(html);
 
       // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
-      const stockList = dom.window.document.querySelector('div.mobile-button-row:nth-child(1) > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
+      const stockList = dom.window.document.querySelector('#prod-stock > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
 
       // gather the stock status of each model (represented as a boolean for being in-stock or not)
-      // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock)
-      let pi4ModelBOneGigModelInStock = stockList[0].textContent.toLowerCase().indexOf('out of stock') === -1;
-      let pi4ModelBTwoGigModelInStock = stockList[1].textContent.toLowerCase().indexOf('out of stock') === -1;
-      let pi4ModelBFourGigModelInStock = stockList[2].textContent.toLowerCase().indexOf('out of stock') === -1;
-      let pi4ModelBEightGigModelInStock = stockList[3].textContent.toLowerCase().indexOf('out of stock') === -1;
+      // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
+      let modelInStock = stockList[0].textContent.toLowerCase().indexOf('out of stock') === -1;
 
       // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
-      checkForNewStock(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock, (adjustedOneGig, adjustedTwoGig, adjustedFourGig, adjustedEightGig) => {
-        pi4ModelBOneGigModelInStock = adjustedOneGig;
-        pi4ModelBTwoGigModelInStock = adjustedTwoGig;
-        pi4ModelBFourGigModelInStock = adjustedFourGig;
-        pi4ModelBEightGigModelInStock = adjustedEightGig;
+      checkForNewStock(modelInStock, (adjustedStatus) => {
+        stockFlags[key] = adjustedStatus;
       });
-
-      // send the stock status to discord and/or slack if any of the models are in stock
-      if (pi4ModelBOneGigModelInStock || pi4ModelBTwoGigModelInStock || pi4ModelBFourGigModelInStock || pi4ModelBEightGigModelInStock) {
-        console.log(chalk.yellowBright(`WE GOT STOCK! : ${pi4ModelBOneGigModelInStock ? '1GB' : ''} ${pi4ModelBTwoGigModelInStock ? '2GB' : ''} ${pi4ModelBFourGigModelInStock ? '4GB' : ''} ${pi4ModelBEightGigModelInStock ? '8GB' : ''}`));
-        if (config.discord.enableBot) {
-          sendToDiscord(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock);
-        }
-        if (config.slack.enableBot) {
-          sendToSlack(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock);
-        }
-      }
-    })
-    .catch(function (error) {
+    }).catch(function (error) {
       console.error(chalk.red('An error occurred during the status refresh:\n'), error);
     });
+
+
+  // send the stock status to discord and/or slack if any stock flags are true (in stock)
+  let atLeastOneInStock = false;
+  Object.keys(stockFlags).forEach(model => {
+    if (stockFlags[model]) {
+      atLeastOneInStock = true;
+    }
+  });
+  if (atLeastOneInStock) {
+    // at least one model is in stock, log to console and send the notification(s)
+    console.log(chalk.greenBright('The following models are in stock:'));
+    Object.keys(stockFlags).forEach(model => {
+      if (stockFlags[model]) {
+        console.log(chalk.cyan(`- ${models.models[model].name}`));
+      }
+    });
+    if (config.discord.enableBot) {
+      sendToDiscord();
+    }
+    if (config.slack.enableBot) {
+      sendToSlack();
+    }
+  }
 }
 
 
@@ -332,10 +381,13 @@ async function sendToSlack(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInSt
 function setupDiscordServer() {
   // first, define the roles we need in the server based on the config (in RGB cus we're real gamers here)
   const roles = [];
-  if (config.modelsSelection.pi4_modelB_1GB) roles.push({ name: 'Pi4 1GB', color: Colors.Red });
-  if (config.modelsSelection.pi4_modelB_2GB) roles.push({ name: 'Pi4 2GB', color: Colors.Green });
-  if (config.modelsSelection.pi4_modelB_4GB) roles.push({ name: 'Pi4 4GB', color: Colors.Blue });
-  if (config.modelsSelection.pi4_modelB_8GB) roles.push({ name: 'Pi4 8GB', color: Colors.Purple });
+  Object.keys(config.modelsSelection).forEach(key => {
+    // this is looking for the config name in each model object that matches the key name of the config selection, then we can grab the discord role settings from it
+    const selectedModelMeta = models.models.find(model => model.configFileName == key);
+    if (config.modelsSelection[selection]) {
+      roles.push({ name: selectedModelMeta.discordRole, color: Colors[selectedModelMeta.discordRoleColor] })
+    }
+  });
 
   // create the roles in the server if they don't exist yet
   roles.forEach(role => {
@@ -343,7 +395,7 @@ function setupDiscordServer() {
       configuredGuild.roles.create({
         name: role.name,
         color: role.color,
-        reason: 'Auto-created by Pi4 Stock Bot for stock notifications',
+        reason: 'Auto-created by Pi Stock Bot for stock notifications',
       })
         .then(role => {
           console.log(chalk.green(`Created role: ${role.name}`));
@@ -356,9 +408,9 @@ function setupDiscordServer() {
   // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
   if (!configuredGuild.channels.cache.find(c => c.name == config.discord.channelName)) {
     configuredGuild.channels.create({
-      name: 'pi4-stock-notifications',
+      name: 'pi-stock-notifications',
       type: ChannelType.GuildText,
-      reason: 'Auto-created by Pi4 Stock Bot for stock notifications',
+      reason: 'Auto-created by Pi Stock Bot for stock notifications',
       permissionOverwrites: [
         {
           id: client.user.id,
@@ -368,7 +420,7 @@ function setupDiscordServer() {
     })
       .then(channel => {
         // set the notification channel in the config to be this new one (so it can be used in the future)
-        config.discord.channelName = 'pi4-stock-notifications';
+        config.discord.channelName = 'pi-stock-notifications';
         fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
         console.log(chalk.green('You didn\'t provide a channel name or it wasn\'t able to be found in the server, so I created one for you!'));
         console.log(chalk.green(`The new channel is named: ${chalk.cyan(channel.name)}`));
@@ -390,57 +442,40 @@ function setupDiscordServer() {
 // this is done so we don't send another notification for a model that has already had a notification sent for it
 // the active status flags get reset when the models go out of stock again so that the next restock will be captured
 
-function checkForNewStock(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock, cb) {
+function checkForNewStock(stockStatusOnSite, model, cb) {
+  let adjustedStatus = false;
   // first, ignore if in stock but has already had notification sent (active)
-  if (pi4ModelBOneGigModelInStock && pi4ModelBOneGigActive) {
-    pi4ModelBOneGigModelInStock = false;
+  if (stockStatusOnSite && stockFlags[model]) {
+    adjustedStatus = false;
   }
   else {
     // in stock and wasn't previously, send a notification and update the active status flag
-    if (pi4ModelBOneGigModelInStock && !pi4ModelBOneGigActive) {
-      pi4ModelBOneGigActive = true;
+    if (stockStatusOnSite && !stockFlags[model]) {
+      adjustedStatus = true;
     }
-    if (!pi4ModelBOneGigModelInStock && pi4ModelBOneGigActive) {
-      pi4ModelBOneGigActive = false;
-    }
-  }
-  if (pi4ModelBTwoGigModelInStock && pi4ModelBTwoGigActive) {
-    pi4ModelBTwoGigModelInStock = false;
-  }
-  else {
-    if (pi4ModelBTwoGigModelInStock && !pi4ModelBTwoGigActive) {
-      pi4ModelBTwoGigActive = true;
-    }
-    if (!pi4ModelBTwoGigModelInStock && pi4ModelBTwoGigActive) {
-      pi4ModelBTwoGigActive = false;
-    }
-  }
-  if (pi4ModelBFourGigModelInStock && pi4ModelBFourGigActive) {
-    pi4ModelBFourGigModelInStock = false;
-  }
-  else {
-    if (pi4ModelBFourGigModelInStock && !pi4ModelBFourGigActive) {
-      pi4ModelBFourGigActive = true;
-    }
-    if (!pi4ModelBFourGigModelInStock && pi4ModelBFourGigActive) {
-      pi4ModelBFourGigActive = false;
-    }
-  }
-  if (pi4ModelBEightGigModelInStock && pi4ModelBEightGigActive) {
-    pi4ModelBEightGigModelInStock = false;
-  }
-  else {
-    if (pi4ModelBEightGigModelInStock && !pi4ModelBEightGigActive) {
-      pi4ModelBEightGigActive = true;
-    }
-    if (!pi4ModelBEightGigModelInStock && pi4ModelBEightGigActive) {
-      pi4ModelBEightGigActive = false;
+    if (!stockStatusOnSite && stockFlags[model]) {
+      adjustedStatus = false;
     }
   }
 
-  // return the updated statuses
-  cb(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock);
+  // return the updated status
+  cb(adjustedStatus);
 }
+
+
+//------------------------------------------
+//------------------------------------------
+
+// Find the key of an object nested inside another (like a model in the greater models collection)
+
+function findKeyOfObject(parent, targetObj) {
+  for (let key in parent) {
+    if (parent[key] === targetObj) {
+      return key;
+    }
+  }
+  return null; // Not found
+};
 
 
 //
