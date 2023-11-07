@@ -68,7 +68,7 @@
       "discordTitle": "Adafruit Raspberry Pi Zero IN STOCK!",
       "discordRole": "PiZero",
       "discordRoleColor": "Cyan",
-      "commonProductPageIdentifier": "n/a",
+      "commonProductPageIdentifier": "",
       "commonProductPageCartButtonIndex": "0"
     },
     "pi_zero_w": {
@@ -82,7 +82,7 @@
       "discordTitle": "Adafruit Raspberry Pi Zero W IN STOCK!",
       "discordRole": "PiZeroW",
       "discordRoleColor": "Magenta",
-      "commonProductPageIdentifier": "n/a",
+      "commonProductPageIdentifier": "",
       "commonProductPageCartButtonIndex": "0"
     },
     "pi_zero_2w": {
@@ -96,7 +96,7 @@
       "discordTitle": "Adafruit Raspberry Pi Zero 2 W IN STOCK!",
       "discordRole": "PiZero2W",
       "discordRoleColor": "Yellow",
-      "commonProductPageIdentifier": "n/a",
+      "commonProductPageIdentifier": "",
       "commonProductPageCartButtonIndex": "0"
     },
     "pi5_4GB": {
