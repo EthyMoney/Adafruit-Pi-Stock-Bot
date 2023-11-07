@@ -1,7 +1,8 @@
 {
   "generalSettings": {
-    "updateIntervalSeconds": 30,
-    "enableSleepMode": true
+    "updateIntervalSeconds": 60,
+    "enableSleepMode": false,
+    "sendInStockAlertsAtStartup": false
   },
   "discord": {
     "enableBot": true,

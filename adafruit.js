@@ -51,7 +51,8 @@ let configuredGuild;       // the discord guild to send the stock status to (get
 
 // flags indicating current stock status of each model (used to prevent sending the same in-stock messages multiple times)
 // it's automatically generated based on the models.json file
-const stockFlags = Object.keys(models.models).forEach(model => {
+const stockFlags = {};
+Object.keys(models.models).forEach(model => {
   stockFlags[model] = false;
   // also add the key name to the models object under the new key "lookupKey" for convenience
   models.models[model].lookupKey = model;
@@ -144,26 +145,37 @@ function checkStockStatus() {
 
   // iterate through all models and for each one that is enabled to check in the config, check the stock status.
   // all newly in stock models will get reported by the box if there are any that went in stock since the last check and have not been reported yet
-  const modelsGroupedByPages = {};
+  const modelsKeys = Object.keys(models.models);
+  const modelsGroupedByPages = [];
+  const ungroupedModels = [];
   Object.keys(config.modelsSelection).forEach(key => {
-    const model = models.models.find(model => model.configFileName == key);
-    // check if the current model is enabled in the config
-    if (config.modelsSelection[model.configFileName]) {
-      // group the models by their commonProductPageIdentifier property since some will have some in common
-      // add each one with the commonProductPageIdentifier as a key into an array of the model objects
-      if (!modelsGroupedByPages[model.commonProductPageIdentifier]) {
-        modelsGroupedByPages[model.commonProductPageIdentifier] = [model]
-      }
-      else {
-        let temp = modelsGroupedByPages[model.commonProductPageIdentifier]
-        temp.push(model);
-        modelsGroupedByPages[model.commonProductPageIdentifier] = temp;
+    for (let i = 0; i < modelsKeys.length; i++) {
+      if (models.models[modelsKeys[i]].configFileName == key) {
+        if (config.modelsSelection[key]) {
+          if (!models.models[modelsKeys[i]].commonProductPageIdentifier.length > 0) {
+            // no commonProductPageIdentifier, so add to ungroupedModels array
+            ungroupedModels.push(models.models[modelsKeys[i]]);
+          }
+          // group the models by their commonProductPageIdentifier property since some will have some in common
+          // add each one with the commonProductPageIdentifier as a key into an array of the model objects
+          if (!modelsGroupedByPages[models.models[modelsKeys[i]].commonProductPageIdentifier]) {
+            // create new group
+            modelsGroupedByPages[models.models[modelsKeys[i]].commonProductPageIdentifier] = [models.models[modelsKeys[i]]]
+          }
+          else {
+            // add to existing group
+            let temp = modelsGroupedByPages[models.models[modelsKeys[i]].commonProductPageIdentifier]
+            temp.push(models.models[modelsKeys[i]]);
+            modelsGroupedByPages[models.models[modelsKeys[i]].commonProductPageIdentifier] = temp;
+          }
+        }
       }
     }
   })
 
   // for each common page, make one page request and check the status of each of the models on that page
   modelsGroupedByPages.forEach(pageGroup => {
+    console.log("oh I hateeeeee " + pageGroup)
     axios.get(model.url)
       .then(function (response) {
         // on successful pull, select the HTML from the response and parse it into a DOM object
@@ -189,28 +201,30 @@ function checkStockStatus() {
       });
   });
 
-  // we are checking this one, load the product page and check the stock status
-  axios.get(model.url)
-    .then(function (response) {
-      // on successful pull, select the HTML from the response and parse it into a DOM object
-      const html = response.data;
-      const dom = new JSDOM(html);
+  // check the ungrouped models (ones that don't have a commonProductPageIdentifier) separately
+  ungroupedModels.forEach(model => {
+    axios.get(model.url)
+      .then(function (response) {
+        // on successful pull, select the HTML from the response and parse it into a DOM object
+        const html = response.data;
+        const dom = new JSDOM(html);
 
-      // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
-      const stockList = dom.window.document.querySelector('#prod-stock > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
+        // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
+        const stockList = dom.window.document.querySelector('#prod-stock > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
 
-      // gather the stock status of each model (represented as a boolean for being in-stock or not)
-      // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
-      let modelInStock = stockList[0].textContent.toLowerCase().indexOf('out of stock') === -1;
+        // gather the stock status of each model (represented as a boolean for being in-stock or not)
+        // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
+        let modelInStock = stockList[model.commonProductPageCartButtonIndex].textContent.toLowerCase().indexOf('out of stock') === -1;
 
-      // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
-      checkForNewStock(modelInStock, (adjustedStatus) => {
-        stockFlags[key] = adjustedStatus;
+        // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
+        checkForNewStock(modelInStock, (adjustedStatus) => {
+          stockFlags[findKeyOfObject(models.models, model)] = adjustedStatus;
+        });
+
+      }).catch(function (error) {
+        console.error(chalk.red('An error occurred during the status refresh:\n'), error);
       });
-    }).catch(function (error) {
-      console.error(chalk.red('An error occurred during the status refresh:\n'), error);
-    });
-
+  });
 
   // send the stock status to discord and/or slack if any stock flags are true (in stock)
   let atLeastOneInStock = false;
@@ -383,9 +397,15 @@ function setupDiscordServer() {
   const roles = [];
   Object.keys(config.modelsSelection).forEach(key => {
     // this is looking for the config name in each model object that matches the key name of the config selection, then we can grab the discord role settings from it
-    const selectedModelMeta = models.models.find(model => model.configFileName == key);
-    if (config.modelsSelection[selection]) {
-      roles.push({ name: selectedModelMeta.discordRole, color: Colors[selectedModelMeta.discordRoleColor] })
+    const modelsKeys = Object.keys(models.models);
+    let selectedModelMeta;
+    for (let i = 0; i < modelsKeys.length; i++) {
+      if (models.models[modelsKeys[i]].configFileName == key) {
+        selectedModelMeta = models.models[modelsKeys[i]];
+        if (config.modelsSelection[key]) {
+          roles.push({ name: selectedModelMeta.discordRole, color: Colors[selectedModelMeta.discordRoleColor] })
+        }
+      }
     }
   });
 
