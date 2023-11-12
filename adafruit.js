@@ -53,9 +53,13 @@ let configuredGuild;       // the discord guild to send the stock status to (get
 // it's automatically generated based on the models.json file
 const stockFlags = {};
 Object.keys(models.models).forEach(model => {
+  // check if the model is enabled in the config, if not, don't add it to the stockFlags object, we will ignore it
+  if(config.modelsSelection[models.models[model].configFileName]){
+    stockFlags[model] = false;
+    // also add the key name to the models object under the new key "lookupKey" for convenience
+    models.models[model].lookupKey = model;
+  }
   stockFlags[model] = false;
-  // also add the key name to the models object under the new key "lookupKey" for convenience
-  models.models[model].lookupKey = model;
 });
 
 // flag indicating if the bot is currently suspended from making queries to Adafruit.com (sleep mode to not query outside of their restock hours)
@@ -175,7 +179,6 @@ function checkStockStatus() {
 
   // for each common page, make one page request and check the status of each of the models on that page
   modelsGroupedByPages.forEach(pageGroup => {
-    console.log("oh I hateeeeee " + pageGroup)
     axios.get(model.url)
       .then(function (response) {
         // on successful pull, select the HTML from the response and parse it into a DOM object
@@ -190,10 +193,9 @@ function checkStockStatus() {
           // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
           let modelInStock = stockList[model.commonProductPageCartButtonIndex].textContent.toLowerCase().indexOf('out of stock') === -1;
 
-          // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
-          checkForNewStock(modelInStock, (adjustedStatus) => {
-            stockFlags[findKeyOfObject(models.models, model)] = adjustedStatus;
-          });
+          // Check new stock statuses against old cached status to see if any models have come in stock that weren't previously
+          // This check will prevent sending another notification for a model that has already had a notification sent for it
+          checkForNewStock(modelInStock, model);
         });
 
       }).catch(function (error) {
@@ -209,20 +211,16 @@ function checkStockStatus() {
         const html = response.data;
         const dom = new JSDOM(html);
 
-        // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
-        const stockList = dom.window.document.querySelector('#prod-stock > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
+        // Look for the add to cart button
+        let modelInStock = checkForAddToCartButton(dom.window.document);
 
-        // gather the stock status of each model (represented as a boolean for being in-stock or not)
-        // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
-        let modelInStock = stockList[model.commonProductPageCartButtonIndex].textContent.toLowerCase().indexOf('out of stock') === -1;
-
-        // verify that the stock status of each model has changed since the last check and update the active flags (prevents duplicate notifications)
-        checkForNewStock(modelInStock, (adjustedStatus) => {
-          stockFlags[findKeyOfObject(models.models, model)] = adjustedStatus;
-        });
+        // Check new stock status against old cached status to see if any models have come in stock that weren't previously
+        // This check will prevent sending another notification for a model that has already had a notification sent for it
+        checkForNewStock(modelInStock, model);
 
       }).catch(function (error) {
         console.error(chalk.red('An error occurred during the status refresh:\n'), error);
+        console.log("we were looking at " + model.name + " : " + model.url);
       });
   });
 
@@ -257,7 +255,7 @@ function checkStockStatus() {
 // this function handles verifying the servers, channels, and roles for discord, then sending the actual notification message out
 // this will send *one* notification message embed that contains all models that are in stock, rather than separate messages for each model (like the slack function does)
 
-function sendToDiscord(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock) {
+function sendToDiscord() {
   console.log(chalk.greenBright('Sending stock status to Discord...'));
   let mentionRolesMessage = ''; // will be populated with the roles to mention based on status of each model
   // grab the roles and channels cache from the configured guild
@@ -267,35 +265,36 @@ function sendToDiscord(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock,
   // create the template embed to send to discord
   const embed = new EmbedBuilder()
     .setColor('#00ff00')
-    .setTitle('Adafruit Raspberry Pi 4 IN STOCK!')
+    .setTitle("Adafruit Raspberry Pies In Stock!")
     .setDescription('The following models are in stock:\n')
-    .setThumbnail('https://cdn-shop.adafruit.com/970x728/4292-06.jpg')
+    .setThumbnail('https://assets.stickpng.com/images/584830fecef1014c0b5e4aa2.png')
     .setTimestamp()
+    .setAuthor({ name: 'Adafruit Pi Stock Bot', iconURL: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png', url: 'https://github.com/EthyMoney/Adafruit-Pi-Stock-Bot' })
     .setFooter({
-      text: 'github.com/EthyMoney/Adafruit-Pi4-Stock-Bot',
-      iconURL: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
+      text: 'In Stock',
+      iconURL: 'https://assets.stickpng.com/images/584830fecef1014c0b5e4aa2.png'
     });
 
   // populate stock fields for all in-stock models where notification is enabled in the config
-  if (pi4ModelBOneGigModelInStock && config.modelsSelection.pi4_modelB_1GB) {
-    embed.addFields({ name: '1GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4295)', inline: true })
-    const oneGigRole = rolesCache.find(role => role.name === 'Pi4 1GB');
-    mentionRolesMessage += (oneGigRole) ? ` ${oneGigRole} ` : console.error(chalk.red('No 1GB role found!'));
-  }
-  if (pi4ModelBTwoGigModelInStock && config.modelsSelection.pi4_modelB_2GB) {
-    embed.addFields({ name: '2GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4292)', inline: true })
-    const twoGigRole = rolesCache.find(role => role.name === 'Pi4 2GB');
-    mentionRolesMessage += (twoGigRole) ? ` ${twoGigRole} ` : console.error(chalk.red('No 2GB role found!'));
-  }
-  if (pi4ModelBFourGigModelInStock && config.modelsSelection.pi4_modelB_4GB) {
-    embed.addFields({ name: '4GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4296)', inline: true })
-    const fourGigRole = rolesCache.find(role => role.name === 'Pi4 4GB');
-    mentionRolesMessage += (fourGigRole) ? ` ${fourGigRole} ` : console.error(chalk.red('No 4GB role found!'));
-  }
-  if (pi4ModelBEightGigModelInStock && config.modelsSelection.pi4_modelB_8GB) {
-    embed.addFields({ name: '8GB Model', value: '[BUY IT!](https://www.adafruit.com/product/4564)', inline: true })
-    const eightGigRole = rolesCache.find(role => role.name === 'Pi4 8GB');
-    mentionRolesMessage += (eightGigRole) ? ` ${eightGigRole} ` : console.error(chalk.red('No 8GB role found!'));
+  // this allows us to group updates together into one message rather than spamming the channel with a message for each model when multiple are in stock at once
+  let fieldsCounter = 0;
+  let lastMetaObj = {};
+  Object.keys(stockFlags).forEach(model => {
+    if (stockFlags[model]) {
+      const modelMeta = models.models[model];
+      embed.addFields({ name: modelMeta.discordFieldName, value: `[BUY IT!](${modelMeta.url})`, inline: true })
+      const modelRole = rolesCache.find(role => role.name === modelMeta.discordRole);
+      mentionRolesMessage += (modelRole) ? ` ${modelRole} ` : console.error(chalk.red('No role found for model: ' + modelMeta.name + ', expected role: ' + modelMeta.discordRole + ''));
+      fieldsCounter++;
+      lastMetaObj = modelMeta;
+    }
+  });
+
+  // if only one model is in stock, we can send a more specific message
+  if (fieldsCounter === 1) {
+    embed.setTitle(lastMetaObj.discordTitle)
+    embed.setDescription(null);
+    embed.setThumbnail(lastMetaObj.image);
   }
 
   // lookup the configured discord TEXT channel by name and send the embed out to the channel
@@ -458,28 +457,52 @@ function setupDiscordServer() {
 //------------------------------------------
 //------------------------------------------
 
+// Function to check for 'Add to Cart' button
+
+function checkForAddToCartButton(document) {
+  const prodStock = document.querySelector("#prod-stock");
+  if (!prodStock) return false;
+
+  const buttons = prodStock.querySelectorAll("button");
+  for (let button of buttons) {
+    if (button.textContent === "Add to Cart") {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+//------------------------------------------
+//------------------------------------------
+
 // check new statuses against the old cached ones to see if any models have come in stock that weren't previously
 // this is done so we don't send another notification for a model that has already had a notification sent for it
 // the active status flags get reset when the models go out of stock again so that the next restock will be captured
 
-function checkForNewStock(stockStatusOnSite, model, cb) {
+function checkForNewStock(stockStatusOnSite, model) {
+  console.log("verifying " + model.name + " : " + stockStatusOnSite)
+  const modelLookupKey = findKeyOfObject(models.models, model);
+  console.log("model key: " + modelLookupKey)
   let adjustedStatus = false;
   // first, ignore if in stock but has already had notification sent (active)
-  if (stockStatusOnSite && stockFlags[model]) {
+  if (stockStatusOnSite && stockFlags[modelLookupKey]) {
     adjustedStatus = false;
   }
   else {
     // in stock and wasn't previously, send a notification and update the active status flag
-    if (stockStatusOnSite && !stockFlags[model]) {
+    if (stockStatusOnSite && !stockFlags[modelLookupKey]) {
       adjustedStatus = true;
     }
-    if (!stockStatusOnSite && stockFlags[model]) {
+    if (!stockStatusOnSite && stockFlags[modelLookupKey]) {
       adjustedStatus = false;
     }
   }
 
-  // return the updated status
-  cb(adjustedStatus);
+  console.log("adjusted status: " + adjustedStatus)
+
+  // update the active status flag for the model
+  stockFlags[modelLookupKey] = adjustedStatus;
 }
 
 
