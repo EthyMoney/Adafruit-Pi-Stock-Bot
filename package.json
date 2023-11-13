@@ -7,15 +7,18 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --no-warnings adafruit.js"
+    "start": "node --no-warnings adafruit.js",
+    "docker-build": "docker build -t ultimate360/adafruit-pi-stock-bot . && echo Docker Image Built!",
+    "docker-deploy": "docker push ultimate360/adafruit-pi-stock-bot:latest",
+    "docker-run": "docker run -d ultimate360/adafruit-pi-stock-bot"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot.git"
   },
   "engines": {
-    "node": ">=18.12.1",
-    "npm": ">=9.1.0"
+    "node": ">=20.9.0",
+    "npm": ">=10.1.0"
   },
   "keywords": [
     "bot",
@@ -38,7 +41,7 @@
   "dependencies": {
     "axios": "^1.6.1",
     "chalk": "^5.3.0",
-    "discord.js": "^14.14.0",
+    "discord.js": "^14.14.1",
     "jsdom": "^22.1.0"
   }
 }
