@@ -16,7 +16,7 @@
 <p align="center">
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://imgur.com/a/cyblDMC" alt="Raspberry Pi 5 Model B" width="35%" height="auto">
+  <img src="https://i.imgur.com/PRQKkJh.png" alt="Raspberry Pi 5 Model B" width="35%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
 </p>
