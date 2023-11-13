@@ -16,7 +16,7 @@
 <p align="center">
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://i.imgur.com/PRQKkJh.png" alt="Raspberry Pi 5 Model B" width="35%" height="auto">
+  <img src="https://i.imgur.com/PRQKkJh.png" alt="Raspberry Pi 5 Model B" width="40%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
 </p>
@@ -30,15 +30,15 @@
 
 ## What This Is
 
-A simple Discord and/or Slack bot that checks the stock status of selected Raspberry Pi models on Adafruit and sends a message to a Discord/Slack channel when one comes in stock. This bot is designed to be self-hosted and run for use in your own Discord server or Slack workspace.
+A simple Discord and Slack bot that checks the stock status of selected Raspberry Pi models on Adafruit and sends a message to a Discord/Slack channel when one comes in stock. This bot is designed to be self-hosted and run for use in your own Discord server or Slack workspace.
 
 ## Why?
 
-Because Adafruit's stock notification system is lacking. It's a FIFO queue that does not reliably trigger notifications in a timely manner and sometimes removed your notification entirely even when you never got one! This means that every time any restock happens at all, even if it's small and doesn't trigger your notification, you'll likely miss it AND have to go back and re-subscribe to the notifications. This bot removes the need for that by allowing you to quickly get a @mention in your Discord server or a message in your Slack channels every time there is a restock without delay!
+Because Adafruit's stock notification system is lacking. It's a FIFO queue that does not reliably trigger notifications in a timely manner and sometimes removes your notification entirely even when you never got one! This means that every time any restock happens at all, even if it's small and doesn't trigger your notification, you'll likely miss it AND have to go back and re-subscribe to the notifications. This bot removes the need for that by allowing you to quickly get a @mention in your Discord server or a message in your Slack channels every time there is a restock without delay!
 
 ## How It Works
 
-On a set interval, the bot will query Adafruit's product pages for the models you have enabled to watch will and check for the stock statuses changing to "In stock". If one or more of the models come in stock, a notification is sent out to the configured Discord server channel with accompanying @role mentions. For Slack, it will just send the notification to the configured channel since Slack doesn't have a roles system like Discord does. In either case, the notification will contain a direct link to the page of the SKU that's in stock so you can buy it right away. Stock statuses are tracked between update intervals, so you won't have to get spammed with the same notification on every check if the bot has already sent a notification for a current stock event of a particular model. This is handled in a smart way to ensure you always get *one* notification every time any model comes in stock, while never missing a restock!
+On a set interval, the bot will query Adafruit's product pages for the models you have enabled to watch and will check for the stock statuses changing to in stock. If one or more of the models come in stock, a notification is sent out to the configured Discord server channel with accompanying @role mentions. For Slack, it will just send the notification to the configured channel since Slack doesn't have a roles system like Discord does. In either case, the notification will contain a direct link to the page of the SKU that's in stock so you can buy it right away. Stock statuses are tracked between update intervals, so you won't have to get spammed with the same notification on every check if the bot has already sent a notification for a current stock event of a particular model. This is handled in a smart way to ensure you always get *one* notification every time any model comes in stock, while never missing a restock!
 
 ## How to Set Up and Run
 
@@ -59,7 +59,7 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
 * Now go ahead and use that link to add your bot to your server. Be sure to leave all permissions checked! These are pre-configured for you.
 * It's important that you add the bot to your server before you proceed. The bot program expects to already have access to the server when it starts up.
 * Now, you need to configure the `config.json` file for your use. Open the file in a text editor.
-* Enter your bot's token. This can be found back in the developer portal under the "Bot" tab again. Click on "Reset Token" and copy it. KEEP THIS SAFE AND PRIVATE!
+* Enter your bot's token under the token field of the discord section. This can be found back in the developer portal under the "Bot" tab again. Click on "Reset Token" and copy it. KEEP THIS SAFE AND PRIVATE!
 * Now enter the ID number of the server you added the bot to earlier. You can get from within Discord by right clicking on the server icon (with developer options enabled in settings)
 * Now enter the name of the channel in your server where you'd like to have updates posted. You can leave this blank if you want the bot to create a new one for you (named pi-stock-notifications)
 
@@ -76,20 +76,28 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
   * "chat:write.customize",
   * and "chat:write.public".
 * Now scroll back up and click the "Install to Workspace" button. Allow the app access to your workspace using the "Allow" button on the screen that appears.
-* You will now be shown a page with your bot token. Copy the "Bot User OAuth Token" and paste it in the slackBotToken parameter in the `config.json`. KEEP THIS TOKEN SAFE AND PRIVATE!
-* Create at least one channel for the bot to post into. Put the name of the channel into the `config.json` under "channelName" in the slack section.
+* You will now be shown a page with your bot token. Copy the "Bot User OAuth Token" and paste it in the token field of the slack section of `config.json`. KEEP THIS TOKEN SAFE AND PRIVATE!
+* Create at least one channel for the bot to post into. Put the name of the channel into the `config.json` under the channelName field in the slack section.
 
 ### Final Configuration Steps and Bot Startup
 
 * In the `config.json` file:
-  * Indicate whether you are using the Discord bot, Slack bot, or even both, using the `enableBot` option in the Discord and Slack sections of the config file. These are both on(true) by default, adjust them accordingly if needed. Remember you can't start without at least one on, why would you try that anyway?
+  * Indicate whether you are using the Discord bot, Slack bot, or even both, using the `enableBot` option in the Discord and Slack sections of the config file. These are both on(true) by default, adjust them accordingly if needed. Remember, you can't start without at least one on, but why would you try that anyway?
   * Enter the update interval in seconds for `updateIntervalSeconds` (default is 60 seconds).
   * Set any models you don't wish to monitor to false under the `modelsSelection` section (all are enabled(true) by default).
   * Choose whether or not you want to have sleep mode enabled using `enableSleepMode`. Sleep mode just prevents the bot from querying Adafruit overnight when restocks aren't happening (this is enabled(true) by default). Prevents needless spam to Adafruit's servers while they are closed.
 * Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory to launch the bot!.
 * If you are using the Discord bot, be sure to make use of the roles that the bot created! Add them to yourself and others so you get mentioned when stock comes in.
-* Optional: You can daemonize the app using PM2 and a process file has been provided to do so. Simply run `pm2 start process.json` in the project directory to start the bot as a daemon. You can also use the `pm2 monit` command to monitor the bot's status and logs. Starting it this way will allow to run in the background and also restart automatically if it crashes for any reason. If on Linux, you can use the `pm2 startup` command to have the bot start on system boot. See the [PM2 docs](https://pm2.keymetrics.io/docs/usage/quick-start/) for more info.
 * That's it! I hope you get the shiny new Pi you've been looking for! :)
+
+### Optional Final Configuration
+
+* You can daemonize the app using PM2. A PM2 process definition file has been provided to do so. Simply run `pm2 start process.json` in the project directory to start the bot as a daemon. You can also use the `pm2 monit` command to monitor the bot's status and log output. Starting it this way will allow to run in the background and also restart automatically if it crashes for any reason. If on Linux, you can use the `pm2 startup` command to have the bot start on system boot. See the [PM2 docs](https://pm2.keymetrics.io/docs/usage/quick-start/) for more info. Highly recommended to use this run method if you want more a of "set it and forget it" experience. It's great!
+
+### That's Cool and All, But, Docker Support When?
+
+Soon. I'm working on it. I promise. It should be ready for the final release of V2 (not beta).
+
 <br>
 
 ## Here's What the Notification Messages Look Like
