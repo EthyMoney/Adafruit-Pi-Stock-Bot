@@ -13,15 +13,7 @@
   "slack": {
     "enableBot": true,
     "token": "",
-    "channel_pi4_modelB_1GB": "",
-    "channel_pi4_modelB_2GB": "",
-    "channel_pi4_modelB_4GB": "",
-    "channel_pi4_modelB_8GB": "",
-    "channel_zero1.3": "",
-    "channel_zeroW": "",
-    "channel_zero2W": "",
-    "channel_pi5_4GB": "",
-    "channel_pi5_8GB": ""
+    "channelName": ""
   },
   "modelsSelection": {
     "pi4_modelB_1GB": true,
