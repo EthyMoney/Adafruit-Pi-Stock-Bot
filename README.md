@@ -2,9 +2,9 @@
   
 # Adafruit Raspberry Pi Stock Alert Bot
 
-  <a href="">[![GitHub tag](https://img.shields.io/github/tag/EthyMoney/Adafruit-Pi4-Stock-Bot?include_prereleases=&sort=semver&color=blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/releases/)</a>
-  <a href="">[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/blob/main/LICENSE)</a>
-  <a href="">[![issues - Adafruit-Pi4-Stock-Bot](https://img.shields.io/github/issues/EthyMoney/Adafruit-Pi4-Stock-Bot)](https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot/issues)</a>
+  <a href="">[![GitHub tag](https://img.shields.io/github/tag/EthyMoney/Adafruit-Pi-Stock-Bot?include_prereleases=&sort=semver&color=blue)](https://github.com/EthyMoney/Adafruit-Pi-Stock-Bot/releases/)</a>
+  <a href="">[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/EthyMoney/Adafruit-Pi-Stock-Bot/blob/main/LICENSE)</a>
+  <a href="">[![issues - Adafruit-Pi-Stock-Bot](https://img.shields.io/github/issues/EthyMoney/Adafruit-Pi-Stock-Bot)](https://github.com/EthyMoney/Adafruit-Pi-Stock-Bot/issues)</a>
   <a href="">[![Made For - Discord](https://img.shields.io/static/v1?label=Made+For&message=Discord&color=%235865F2&logo=discord)](https://discord.com/)</a>
   <a href="">[![Made For - Slack](https://img.shields.io/static/v1?label=Made+For&message=Slack&color=%234A154B&logo=slack&logoColor=%23E01E5A)](https://slack.com/)</a>
   <a href="">[![Node.js - >=20.9.0](https://img.shields.io/badge/Node.js->=20.9.0-brightgreen?logo=node.js)](https://nodejs.org/en/)</a>
@@ -103,9 +103,11 @@ Soon. I'm working on it and it's already nearly ready. It should be ready for th
 ## Here's What the Notification Messages Look Like
 
 <p align="center">
-  <img src="https://imgur.com/55fdrDT.png" alt="Discord Message" width="42%" height="auto">
+  <img src="https://i.imgur.com/PdXCD0g.png" alt="Discord Message Multi" width="42%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://imgur.com/OOzKLZH.png" alt="Slack Message" width="51%" height="auto">
+  <img src="https://i.imgur.com/T6EFYXo.png" alt="Discord Message Single" width="42%" height="auto">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://i.imgur.com/QOiO6RL.png" alt="Slack Message" width="51%" height="auto">
 </p>
 <br>
 
