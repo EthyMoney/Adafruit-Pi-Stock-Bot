@@ -10,7 +10,7 @@
  *
  *
  *
- * Author:      Logan S. ~ EthyMoney#5000(Discord) ~ EthyMoney(GitHub)
+ * Author:      Logan S. ~ EthyMoney (Discord and GitHub)
  * Program:     Adafruit Raspberry Pi Stock Bot
  * GitHub:      https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot
  *
@@ -38,6 +38,8 @@
 // -------------------------------------------
 // -------------------------------------------
 
+// import the package json
+import * as packageJson from './package.json' assert { type: "json" };
 import { Client, GatewayIntentBits, ShardClientUtil, EmbedBuilder, ChannelType, PermissionFlagsBits, Colors } from 'discord.js';
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 import axios from 'axios';
@@ -49,13 +51,19 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 const models = JSON.parse(fs.readFileSync('models.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
+console.log(chalk.cyan("\nWelcome to Adafruit Pi Stock Bot! :)\n"));
+console.log(chalk.blue("Author: " + chalk.cyan("Logan S. ~ EthyMoney (Discord and GitHub)")));
+console.log(chalk.blue("Version: " + chalk.cyan(packageJson.default.version)) + "\n");
+
 // flags indicating current stock status of each model (used to prevent sending the same in-stock messages multiple times)
 // it's automatically generated based on the models.json file
 const stockFlags = {};
+const alreadySentFlags = {};
 Object.keys(models.models).forEach(model => {
   // check if the model is enabled in the config, if not, don't add it to the stockFlags object, we will ignore it
   if(config.modelsSelection[models.models[model].configFileName]){
     stockFlags[model] = false;
+    alreadySentFlags[model] = false;
     // also add the key name to the models object under the new key "lookupKey" for convenience
     models.models[model].lookupKey = model;
   }
@@ -80,7 +88,7 @@ setInterval(() => { checkStockStatus(); }, config.generalSettings.updateInterval
 
 // show a startup message so the user knows the bot is running (if only using the Slack bot)
 if (!config.discord.enableBot) {
-  console.log(chalk.green(chalk.yellow('\n[BOT START]') + ' I\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.generalSettings.updateIntervalSeconds) + ' seconds...\n'));
+  console.log(chalk.green(chalk.yellow('\n[BOT START]\n') + 'I\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.generalSettings.updateIntervalSeconds) + ' seconds...\n'));
 }
 
 
@@ -97,7 +105,7 @@ if (!config.discord.enableBot) {
 // this is when we want to do our discord setup tasks and make an initial stock status check
 
 client.on('ready', () => {
-  console.log(chalk.greenBright(`Logged in as ${client.user.tag} in ${client.guilds.cache.size} servers while using ${clientShardHelper.count} shard(s)!`));
+  console.log(chalk.greenBright(`Logged into Discord as ${client.user.tag} in ${client.guilds.cache.size} servers while using ${clientShardHelper.count} shard(s)!`));
   // set the bot's presence
   client.user.setActivity('for Pis!', { type: 'WATCHING' });
   // get the discord guild to send the stock status to
@@ -279,8 +287,10 @@ function sendToDiscord() {
   // this allows us to group updates together into one message rather than spamming the channel with a message for each model when multiple are in stock at once
   let fieldsCounter = 0;
   let lastMetaObj = {};
+  console.log("the whole models object is " + JSON.stringify(stockFlags, null, 2));
   Object.keys(stockFlags).forEach(model => {
     if (stockFlags[model]) {
+      console.log("this model is in stock " + model);
       const modelMeta = models.models[model];
       embed.addFields({ name: modelMeta.discordFieldName, value: `[BUY IT!](${modelMeta.url})`, inline: true })
       const modelRole = rolesCache.find(role => role.name === modelMeta.discordRole);
@@ -333,34 +343,21 @@ function sendToDiscord() {
 // function to send stock statuses to Slack for models that are in stock
 // this will send each model in stock as separate notification messages if multiple models are in stock at once
 
-async function sendToSlack(pi4ModelBOneGigModelInStock, pi4ModelBTwoGigModelInStock, pi4ModelBFourGigModelInStock, pi4ModelBEightGigModelInStock) {
+async function sendToSlack() {
   console.log(chalk.greenBright('Sending stock status to Slack...'));
   const url = 'https://slack.com/api/chat.postMessage';
   const authorizationHeader = { headers: { authorization: `Bearer ${config.slack.token}` } };
-  if (pi4ModelBOneGigModelInStock && config.modelsSelection.pi4_modelB_1GB) {
-    const channel = config.slack.channel_pi4_modelB_1GB;
-    const username = 'PI4 Model B 1GB IN STOCK';
-    const messageText = '@channel The 1GB model is in stock on Adafruit! <https://www.adafruit.com/product/4295|BUY IT>';
-    postMessage(channel, username, messageText, '1GB');
-  }
-  if (pi4ModelBTwoGigModelInStock && config.modelsSelection.pi4_modelB_2GB) {
-    const channel = config.slack.channel_pi4_modelB_2GB;
-    const username = 'PI4 Model B 2GB IN STOCK';
-    const messageText = '@channel The 2GB model is in stock on Adafruit! <https://www.adafruit.com/product/4292|BUY IT>';
-    postMessage(channel, username, messageText, '2GB');
-  }
-  if (pi4ModelBFourGigModelInStock && config.modelsSelection.pi4_modelB_4GB) {
-    const channel = config.slack.channel_pi4_modelB_4GB;
-    const username = 'PI4 Model B 4GB IN STOCK';
-    const messageText = '@channel The 4GB model is in stock on Adafruit! <https://www.adafruit.com/product/4296|BUY IT>';
-    postMessage(channel, username, messageText, '4GB');
-  }
-  if (pi4ModelBEightGigModelInStock && config.modelsSelection.pi4_modelB_8GB) {
-    const channel = config.slack.channel_pi4_modelB_8GB;
-    const username = 'PI4 Model B 8GB IN STOCK';
-    const messageText = '@channel The 8GB model is in stock on Adafruit! <https://www.adafruit.com/product/4564|BUY IT>';
-    postMessage(channel, username, messageText, '8GB');
-  }
+
+  // for each model in stock, generate and post a message to slack
+  Object.keys(stockFlags).forEach(model => {
+    if (stockFlags[model]) {
+      const modelMeta = models.models[model];
+      const channel = config.slack.channelName;
+      const username = modelMeta.slackBotShortName;
+      const messageText = modelMeta.slackMessage + ' <' + modelMeta.url + '|BUY IT>';
+      postMessage(channel, username, messageText, modelMeta.slackBotShortName);
+    }
+  });
 
   // nested function to post the message(s) (called for each model)
   async function postMessage(channel, username, messageText, model) {
@@ -450,7 +447,7 @@ function setupDiscordServer() {
       });
   }
   console.log(chalk.greenBright(`Discord server setup complete for ${chalk.cyan(configuredGuild.name)}  Lets go! ⚡⚡⚡`));
-  console.log(chalk.green('\nI\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.generalSettings.updateIntervalSeconds) + ' seconds...\n'));
+  console.log(chalk.green(chalk.yellow('\n[BOT START]\n') + 'I\'m watching for stock updates now! I\'ll check Adafruit every ' + chalk.cyan(config.generalSettings.updateIntervalSeconds) + ' seconds...\n'));
 }
 
 
@@ -481,26 +478,26 @@ function checkForAddToCartButton(document) {
 // the active status flags get reset when the models go out of stock again so that the next restock will be captured
 
 function checkForNewStock(stockStatusOnSite, model) {
-  console.log("verifying " + model.name + " : " + stockStatusOnSite)
   const modelLookupKey = findKeyOfObject(models.models, model);
-  console.log("model key: " + modelLookupKey)
   let adjustedStatus = false;
-  // first, ignore if in stock but has already had notification sent (active)
-  if (stockStatusOnSite && stockFlags[modelLookupKey]) {
+  // if the model is in stock and the cached status is false (not in stock), set the active status flag to true
+  if (stockStatusOnSite && !alreadySentFlags[modelLookupKey]) {
+    // set the active status flag to true
+    adjustedStatus = true;
+    // set the already sent flag to true so we don't send another notification for this model
+    alreadySentFlags[modelLookupKey] = true;
+  }
+  // if the model is not in stock and the cached status is true (in stock), set the active status flag to false
+  else if (!stockStatusOnSite && alreadySentFlags[modelLookupKey]) {
+    // set the active status flag to false
+    adjustedStatus = false;
+    // set the already sent flag to false so we can send another notification for this model when it comes back in stock
+    alreadySentFlags[modelLookupKey] = false;
+  }
+  // if it's in stock, and we already sent a notification for it, set the active status flag to false so a new notification doesn't get sent
+  else{
     adjustedStatus = false;
   }
-  else {
-    // in stock and wasn't previously, send a notification and update the active status flag
-    if (stockStatusOnSite && !stockFlags[modelLookupKey]) {
-      adjustedStatus = true;
-    }
-    if (!stockStatusOnSite && stockFlags[modelLookupKey]) {
-      adjustedStatus = false;
-    }
-  }
-
-  console.log("adjusted status: " + adjustedStatus)
-
   // update the active status flag for the model
   stockFlags[modelLookupKey] = adjustedStatus;
 }
