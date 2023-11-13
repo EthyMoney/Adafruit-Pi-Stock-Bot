@@ -61,7 +61,7 @@ const stockFlags = {};
 const alreadySentFlags = {};
 Object.keys(models.models).forEach(model => {
   // check if the model is enabled in the config, if not, don't add it to the stockFlags object, we will ignore it
-  if(config.modelsSelection[models.models[model].configFileName]){
+  if (config.modelsSelection[models.models[model].configFileName]) {
     stockFlags[model] = false;
     alreadySentFlags[model] = false;
     // also add the key name to the models object under the new key "lookupKey" for convenience
@@ -158,7 +158,7 @@ function checkStockStatus() {
   // iterate through all models and for each one that is enabled to check in the config, check the stock status.
   // all newly in stock models will get reported by the box if there are any that went in stock since the last check and have not been reported yet
   const modelsKeys = Object.keys(models.models);
-  const modelsGroupedByPages = [];
+  let modelsGroupedByPages = [];
   const ungroupedModels = [];
   Object.keys(config.modelsSelection).forEach(key => {
     for (let i = 0; i < modelsKeys.length; i++) {
@@ -167,6 +167,7 @@ function checkStockStatus() {
           if (!models.models[modelsKeys[i]].commonProductPageIdentifier.length > 0) {
             // no commonProductPageIdentifier, so add to ungroupedModels array
             ungroupedModels.push(models.models[modelsKeys[i]]);
+            return;
           }
           // group the models by their commonProductPageIdentifier property since some will have some in common
           // add each one with the commonProductPageIdentifier as a key into an array of the model objects
@@ -185,8 +186,19 @@ function checkStockStatus() {
     }
   })
 
+  // clean up the modelsGroupedByPages array so it's not an object with keys, but just an array of arrays now that we don't need the keys anymore
+  let newArray = [];
+  for (const key in modelsGroupedByPages) {
+    if (modelsGroupedByPages.hasOwnProperty(key)) {
+      newArray.push(modelsGroupedByPages[key]);
+    }
+  }
+  modelsGroupedByPages = newArray;
+
   // for each common page, make one page request and check the status of each of the models on that page
   modelsGroupedByPages.forEach(pageGroup => {
+    // use the URL of the fist model in the group to make the request for checking all models on the page
+    const model = pageGroup[0];
     axios.get(model.url)
       .then(function (response) {
         // on successful pull, select the HTML from the response and parse it into a DOM object
@@ -194,7 +206,7 @@ function checkStockStatus() {
         const dom = new JSDOM(html);
 
         // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
-        const stockList = dom.window.document.querySelector('#prod-stock > div:nth-child(1) > ol:nth-child(2)').querySelectorAll('li');
+        const stockList = dom.window.document.querySelector('#prod-stock').querySelectorAll('li');
 
         pageGroup.forEach(model => {
           // gather the stock status of each model (represented as a boolean for being in-stock or not)
@@ -495,7 +507,7 @@ function checkForNewStock(stockStatusOnSite, model) {
     alreadySentFlags[modelLookupKey] = false;
   }
   // if it's in stock, and we already sent a notification for it, set the active status flag to false so a new notification doesn't get sent
-  else{
+  else {
     adjustedStatus = false;
   }
   // update the active status flag for the model

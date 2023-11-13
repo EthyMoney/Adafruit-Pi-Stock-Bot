@@ -1,0 +1,29 @@
+{
+  "generalSettings": {
+    "updateIntervalSeconds": 60,
+    "enableSleepMode": true,
+    "sendInStockAlertsAtStartup": false
+  },
+  "discord": {
+    "enableBot": false,
+    "token": "",
+    "serverID": "",
+    "channelName": ""
+  },
+  "slack": {
+    "enableBot": false,
+    "token": "",
+    "channelName": ""
+  },
+  "modelsSelection": {
+    "pi4_modelB_1GB": true,
+    "pi4_modelB_2GB": true,
+    "pi4_modelB_4GB": true,
+    "pi4_modelB_8GB": true,
+    "zero": true,
+    "zeroW": true,
+    "zero2W": true,
+    "pi5_4GB": true,
+    "pi5_8GB": true
+  }
+}

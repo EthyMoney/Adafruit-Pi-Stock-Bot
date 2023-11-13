@@ -6,5 +6,6 @@ node_modules
 .eslintrc
 .eslintrc.json
 .gitignore
+config.json
 process.json
 .gitattributes

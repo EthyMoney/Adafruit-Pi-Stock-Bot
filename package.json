@@ -10,7 +10,8 @@
     "start": "node --no-warnings adafruit.js",
     "docker-build": "docker build -t ultimate360/adafruit-pi-stock-bot . && echo Docker Image Built!",
     "docker-deploy": "docker push ultimate360/adafruit-pi-stock-bot:latest",
-    "docker-run": "docker run -d ultimate360/adafruit-pi-stock-bot"
+    "docker-run-linux": "docker run -v $(pwd)/config.json:/src/app/config.json -d ultimate360/adafruit-pi-stock-bot",
+    "docker-run-windows": "docker run -v %cd%/config.json:/src/app/config.json -d ultimate360/adafruit-pi-stock-bot"
   },
   "repository": {
     "type": "git",

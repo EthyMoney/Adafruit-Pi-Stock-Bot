@@ -9,7 +9,8 @@
       ],
       "watch": false,
       "args": [
-        "--color"
+        "--color",
+        "--no-warnings"
       ],
       "env": {
         "DEBUG_COLORS": true
