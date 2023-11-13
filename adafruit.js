@@ -12,7 +12,7 @@
  *
  * Author:      Logan S. ~ EthyMoney (Discord and GitHub)
  * Program:     Adafruit Raspberry Pi Stock Bot
- * GitHub:      https://github.com/EthyMoney/Adafruit-Pi4-Stock-Bot
+ * GitHub:      https://github.com/EthyMoney/Adafruit-Pi-Stock-Bot
  *
  * Discord and Slack bot that sends stock alerts of Raspberry Pi models on Adafruit.com
  *
@@ -240,7 +240,7 @@ function checkStockStatus() {
 
       }).catch(function (error) {
         console.error(chalk.red('An error occurred during the status refresh:\n'), error);
-        console.log("we were looking at " + model.name + " : " + model.url);
+        console.log("During this error, we were looking at " + model.name + " : " + model.url);
       });
   });
 
@@ -299,10 +299,8 @@ function sendToDiscord() {
   // this allows us to group updates together into one message rather than spamming the channel with a message for each model when multiple are in stock at once
   let fieldsCounter = 0;
   let lastMetaObj = {};
-  console.log("the whole models object is " + JSON.stringify(stockFlags, null, 2));
   Object.keys(stockFlags).forEach(model => {
     if (stockFlags[model]) {
-      console.log("this model is in stock " + model);
       const modelMeta = models.models[model];
       embed.addFields({ name: modelMeta.discordFieldName, value: `[BUY IT!](${modelMeta.url})`, inline: true })
       const modelRole = rolesCache.find(role => role.name === modelMeta.discordRole);
