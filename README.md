@@ -103,11 +103,11 @@ Soon. I'm working on it and it's already nearly ready. It should be ready for th
 ## Here's What the Notification Messages Look Like
 
 <p align="center">
-  <img src="https://i.imgur.com/PdXCD0g.png" alt="Discord Message Multi" width="42%" height="auto">
+  <img src="https://i.imgur.com/PdXCD0g.png" alt="Discord Message Multi" width="44%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://i.imgur.com/T6EFYXo.png" alt="Discord Message Single" width="42%" height="auto">
+  <img src="https://i.imgur.com/T6EFYXo.png" alt="Discord Message Single" width="50%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://i.imgur.com/QOiO6RL.png" alt="Slack Message" width="51%" height="auto">
+  <img src="https://i.imgur.com/QOiO6RL.png" alt="Slack Message" width="58%" height="auto">
 </p>
 <br>
 
