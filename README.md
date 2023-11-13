@@ -92,11 +92,11 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
 
 ### Optional Final Configuration
 
-* You can daemonize the app using PM2. A PM2 process definition file has been provided to do so. Simply run `pm2 start process.json` in the project directory to start the bot as a daemon. You can also use the `pm2 monit` command to monitor the bot's status and log output. Starting it this way will allow to run in the background and also restart automatically if it crashes for any reason. If on Linux, you can use the `pm2 startup` command to have the bot start on system boot. See the [PM2 docs](https://pm2.keymetrics.io/docs/usage/quick-start/) for more info. Highly recommended to use this run method if you want more a of "set it and forget it" experience. It's great!
+* You can daemonize the app using PM2. A PM2 process definition file has been provided to do so. Simply run `pm2 start process.json` in the project directory to start the bot as a daemon. You can also use the `pm2 monit` command to monitor the bot's status and log output. Starting the bot this way will allow it to run in the background and also restart automatically if it crashes for any reason. If on Linux, you can use the `pm2 startup` command to have the bot start on system boot. See the [PM2 docs](https://pm2.keymetrics.io/docs/usage/quick-start/) for more info. Highly recommended using this run method if you want more a of "set it and forget it" experience. It's great!
 
 ### That's Cool and All, But, Docker Support When?
 
-Soon. I'm working on it. I promise. It should be ready for the final release of V2 (not beta).
+Soon. I'm working on it and it's already nearly ready. It should be ready for the final release of V2 (not beta).
 
 <br>
 
