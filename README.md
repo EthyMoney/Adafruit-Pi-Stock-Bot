@@ -113,6 +113,6 @@ Soon. I'm working on it and it's already nearly ready. It should be ready for th
 
 ## One More Thing
 
-Like this bot? Show some support! Give me a star on this repo and share it with your friends! You can also sign up for Digital Ocean to host the bot at or whatever else, I get a small referally kickback when you use the blue Digital Ocean button at the top :)<br>
+Like this bot? Show some support! Give me a star on this repo and share it with your friends! You can also sign up for Digital Ocean to host this bot or whatever else on, I get a small referal kickback when you use the blue Digital Ocean button at the top of this page :)<br>
 Contributions are welcome and encouraged! Feel free to open a pull request or issue for things you notice or want to fix/improve.<br>
 If you want to chat, you can find me in the support Discord server of my other popular bot that I made called TsukiBot, [Join Here!](https://discord.gg/t7Ka9ycEyD)
