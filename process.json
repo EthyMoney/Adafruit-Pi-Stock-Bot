@@ -12,7 +12,8 @@
         "--color"
       ],
       "env": {
-        "DEBUG_COLORS": true
+        "DEBUG_COLORS": true,
+        "NODE_NO_WARNINGS": 1
       }
     }
   ]

@@ -1,17 +1,17 @@
 {
   "generalSettings": {
     "updateIntervalSeconds": 60,
-    "enableSleepMode": false,
+    "enableSleepMode": true,
     "sendInStockAlertsAtStartup": false
   },
   "discord": {
-    "enableBot": true,
+    "enableBot": false,
     "token": "",
     "serverID": "",
     "channelName": ""
   },
   "slack": {
-    "enableBot": true,
+    "enableBot": false,
     "token": "",
     "channelName": ""
   },
