@@ -28,9 +28,20 @@
 
 </div>
 
-## What This Is
+# Contents
 
-A simple Discord and Slack bot that checks the stock status of selected Raspberry Pi models on Adafruit and sends a message to a Discord/Slack channel when one comes in stock. This bot is designed to be self-hosted and run for use in your own Discord server or Slack workspace.
+- [What This Is](#what-this-is)
+- [Why?](#why)
+- [How It Works](#how-it-works)
+- [How to Set Up and Run](#how-to-set-up-and-run)
+  - [Discord Bot Set Up](#discord-bot-set-up)
+  - [Slack Bot Set Up](#slack-bot-set-up)
+  - [Final Configuration Steps and Bot Startup](#final-configuration-steps-and-bot-startup)
+  - [Optional Final Configuration](#optional-final-configuration)
+  - [Running as Docker Container](#running-as-docker-container)
+- [Customizing the Messages and Adding Additional Models](#customizing-the-messages-and-adding-additional-models)
+- [What the Messages Look Like](#what-the-messages-look-like)
+- [One More Thing](#one-more-thing)
 
 ## Why?
 
@@ -108,13 +119,13 @@ Once the container starts, you will notice it immediately exits. This is because
 
 If you wish to build the container yourself, like maybe if you want the latest commits in the branch above the last release, or you made your own modifications, there are npm commands to help you do this. You can run `npm run docker-build` to build the container, and `npm run docker-run` to run it. These scripts utilize pre-configured settings through a dockerfile and volume mounting of configuration files.<br>
 
-### Customizing the Notification Messages and Adding New Models
+### Customizing the Messages and Adding Additional Models
 
 You may notice another file sitting in the /config directory, named `models.json`. The file contains all of the metadata the bot uses for the stock notifications. You can edit this file to change the notification messages to your liking, whether that be new descriptions, titles, names, links, images, etc. You can also add new models to the file if you want to monitor more than the default models. The bot will automatically pick up any changes you make to this file and use them. Just be sure to follow the same format as the other default models in the file and remember to add them as modelSelections options to the `config.json` with the name matching what you put for `configFileName` in the models file. Enjoy!
 
 <br>
 
-## Here's What the Notification Messages Look Like
+## What the Messages Look Like
 
 <p align="center">
   <img src="https://i.imgur.com/PdXCD0g.png" alt="Discord Message Multi" width="44%" height="auto">
