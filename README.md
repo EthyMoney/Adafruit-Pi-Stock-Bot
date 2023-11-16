@@ -43,6 +43,10 @@
 - [What the Messages Look Like](#what-the-messages-look-like)
 - [One More Thing](#one-more-thing)
 
+## What This Is
+
+A simple Discord and Slack bot that checks the stock status of selected Raspberry Pi models on Adafruit and sends a message to a Discord/Slack channel when one comes in stock. This bot is designed to be self-hosted and run for use in your own Discord server or Slack workspace.
+
 ## Why?
 
 Because Adafruit's stock notification system is lacking. It's a FIFO queue that does not reliably trigger notifications in a timely manner and sometimes removes your notification entirely even when you never got one! This means that every time any restock happens at all, even if it's small and doesn't trigger your notification, you'll likely miss it AND have to go back and re-subscribe to the notifications. This bot removes the need for that by allowing you to quickly get a @mention in your Discord server or a message in your Slack channels every time there is a restock without delay!
