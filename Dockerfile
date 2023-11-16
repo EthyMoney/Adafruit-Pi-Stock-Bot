@@ -13,8 +13,8 @@ WORKDIR /usr/src/app
 # Copy in the app source code
 COPY . .
 
-# Rename config-docker.json to config.json
-RUN mv config-docker.json config.json
+# Rename template-config-docker-only.json to config.json
+RUN mv config/template-config-docker-only.json config/config.json
 
 # Install the production dependencies
 RUN npm ci --only=production

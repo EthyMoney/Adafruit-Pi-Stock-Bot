@@ -58,10 +58,10 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
 * Replace `APPLICATION_ID_HERE` in that link with your actual application ID you copied earlier.
 * Now go ahead and use that link to add your bot to your server. Be sure to leave all permissions checked! These are pre-configured for you.
 * It's important that you add the bot to your server before you proceed. The bot program expects to already have access to the server when it starts up.
-* Now, you need to configure the `config.json` file for your use. Open the file in a text editor.
-* Enter your bot's token under the token field of the discord section. This can be found back in the developer portal under the "Bot" tab again. Click on "Reset Token" and copy it. KEEP THIS SAFE AND PRIVATE!
-* Now enter the ID number of the server you added the bot to earlier. You can get from within Discord by right clicking on the server icon (with developer options enabled in settings)
-* Now enter the name of the channel in your server where you'd like to have updates posted. You can leave this blank if you want the bot to create a new one for you (named pi-stock-notifications)
+* Now, you need to configure the `config.json` file for your use. This file is located in the `/config` directory. Open the file in a text editor.
+* Enter your bot's token under the `token` field of the discord section of the config. Your token can be found back in the developer portal under the "Bot" tab again. Click on "Reset Token" and copy it. KEEP THIS SAFE AND PRIVATE!
+* Now enter the ID number of the server you added the bot to earlier for the `serverID` field. You can get from within Discord by right clicking on the server icon (with developer options enabled in settings)
+* Now enter the name of the channel in your server where you'd like to have updates posted for the `channelName` field. You can leave this blank if you want the bot to create a new one for you (will be named pi-stock-notifications)
 
 ### Slack Bot Set Up
 
@@ -74,10 +74,10 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
   * "links:write",
   * "channels:manage",
   * "chat:write.customize",
-  * and "chat:write.public".
+  * "chat:write.public".
 * Now scroll back up and click the "Install to Workspace" button. Allow the app access to your workspace using the "Allow" button on the screen that appears.
-* You will now be shown a page with your bot token. Copy the "Bot User OAuth Token" and paste it in the token field of the slack section of `config.json`. KEEP THIS TOKEN SAFE AND PRIVATE!
-* Create at least one channel for the bot to post into. Put the name of the channel into the `config.json` under the channelName field in the slack section.
+* You will now be shown a page with your bot token. Copy the "Bot User OAuth Token" and paste it in the `token` field of the slack section in the `config.json`. KEEP THIS TOKEN SAFE AND PRIVATE!
+* Create at least one channel for the bot to post into. Put the name of the channel into the `config.json` in the `channelName` field of the slack section.
 
 ### Final Configuration Steps and Bot Startup
 
@@ -94,9 +94,23 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
 
 * You can daemonize the app using PM2. A PM2 process definition file has been provided to do so. Simply run `pm2 start process.json` in the project directory to start the bot as a daemon. You can also use the `pm2 monit` command to monitor the bot's status and log output. Starting the bot this way will allow it to run in the background and also restart automatically if it crashes for any reason. If on Linux, you can use the `pm2 startup` command to have the bot start on system boot. See the [PM2 docs](https://pm2.keymetrics.io/docs/usage/quick-start/) for more info. Highly recommended using this run method if you want more a of "set it and forget it" experience. It's great!
 
-### That's Cool and All, But, Docker Support When?
+### Running as Docker Container
 
-Soon. I'm working on it and it's already nearly ready. It should be ready for the final release of V2 (not beta).
+If you prefer Docker, it is supported to deploy this bot as a container. A Docker Hub repository is maintained and updated with each release of the bot. You can find it [here](https://hub.docker.com/r/ultimate360/adafruit-pi-stock-bot).<br>
+
+To run the container using the latest release, you can use the following command:
+
+* `docker run -v adafruit-pi-bot:/usr/src/app/config:rw -d ultimate360/adafruit-pi-stock-bot`
+
+The /config directory is added as volume so you can access config files from your host. As written, it uses the default volumes location and names it adafruit-pi-bot. You can change this name or customize the mount path to whatever you want, just be sure to update the command above to match.<br>
+
+Once the container starts, you will notice it immediately exits. This is because the config file is missing values that you need to go fill in. Use the above normal instructions to fill in the config.json file located at the new volume mount we created. Once you have done this, you can restart the container and it will run normally.<br>
+
+If you wish to build the container yourself, like maybe if you want the latest commits in the branch above the last release, or you made your own modifications, there are npm commands to help you do this. You can run `npm run docker-build` to build the container, and `npm run docker-run` to run it. These scripts utilize pre-configured settings through a dockerfile and volume mounting of configuration files.<br>
+
+### Customizing the Notification Messages and Adding New Models
+
+You may notice another file sitting in the /config directory, named `models.json`. The file contains all of the metadata the bot uses for the stock notifications. You can edit this file to change the notification messages to your liking, whether that be new descriptions, titles, names, links, images, etc. You can also add new models to the file if you want to monitor more than the default models. The bot will automatically pick up any changes you make to this file and use them. Just be sure to follow the same format as the other default models in the file and remember to add them as modelSelections options to the `config.json` with the name matching what you put for `configFileName` in the models file. Enjoy!
 
 <br>
 

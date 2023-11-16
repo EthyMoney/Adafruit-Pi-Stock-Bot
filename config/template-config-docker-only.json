@@ -2,7 +2,7 @@
   "generalSettings": {
     "updateIntervalSeconds": 60,
     "enableSleepMode": true,
-    "sendInStockAlertsAtStartup": false
+    "skipStartupAlerts": false
   },
   "discord": {
     "enableBot": false,

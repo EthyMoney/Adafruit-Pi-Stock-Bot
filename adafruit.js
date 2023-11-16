@@ -47,8 +47,8 @@ import { JSDOM } from 'jsdom';
 import chalk from 'chalk';
 import fs from 'fs';
 const clientShardHelper = new ShardClientUtil(client);
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-const models = JSON.parse(fs.readFileSync('models.json', 'utf8'));
+const config = JSON.parse(fs.readFileSync('config/config.json', 'utf8'));
+const models = JSON.parse(fs.readFileSync('config/models.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
 
 console.log(chalk.cyan("\nWelcome to Adafruit Pi Stock Bot! :)\n"));
