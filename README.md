@@ -14,11 +14,11 @@
 
 <br>
 <p align="center">
-  <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
+  <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="18%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://i.imgur.com/PRQKkJh.png" alt="Raspberry Pi 5 Model B" width="45%" height="auto">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="20%" height="auto">
+  <img src="https://imgur.com/ndaGhdY.png" alt="Alert Icon" width="18%" height="auto">
 </p>
 <br>
 
