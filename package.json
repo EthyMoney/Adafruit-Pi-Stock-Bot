@@ -1,6 +1,6 @@
 {
   "name": "adafruit-pi-stock-bot",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "description": "A simple Discord and Slack bot that that checks the stock status of selected Raspberry Pi models on Adafruit and sends a message to a Discord and/or Slack channel when one comes in stock.",
   "main": "adafruit.js",
   "type": "module",
@@ -42,7 +42,7 @@
     "pm2": "^5.3.0"
   },
   "dependencies": {
-    "axios": "^1.6.1",
+    "axios": "^1.6.2",
     "chalk": "^5.3.0",
     "discord.js": "^14.14.1",
     "jsdom": "^22.1.0"
