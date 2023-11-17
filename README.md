@@ -101,6 +101,7 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
   * Enter the update interval in seconds for `updateIntervalSeconds` (default is 60 seconds).
   * Set any models you don't wish to monitor to false under the `modelsSelection` section (all are enabled(true) by default).
   * Choose whether or not you want to have sleep mode enabled using `enableSleepMode`. Sleep mode just prevents the bot from querying Adafruit overnight when restocks aren't happening (this is enabled(true) by default). Prevents needless spam to Adafruit's servers while they are closed.
+  * Set whether you want to skip sending alerts for in-stock models right on bot startup using the `skipStartupAlerts` options in `config.json`. This is useful if you are restarting the bot multiple times up and don't want to get spammed with alerts for models that are currently in stock at every startup. This is disabled(false) by default. If enabled, it will skip sending a stock alert for currently in stock models when the bot starts, but will send them when they come back in stock after going out of stock while the bot is running.
 * Yay! You are now ready to start your bot! Go ahead and run `npm start` in a terminal of the project directory to launch the bot!.
 * If you are using the Discord bot, be sure to make use of the roles that the bot created! Add them to yourself and others so you get mentioned when stock comes in.
 * That's it! I hope you get the shiny new Pi you've been looking for! :)

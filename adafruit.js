@@ -50,6 +50,7 @@ const clientShardHelper = new ShardClientUtil(client);
 const config = JSON.parse(fs.readFileSync('config/config.json', 'utf8'));
 const models = JSON.parse(fs.readFileSync('config/models.json', 'utf8'));
 let configuredGuild;       // the discord guild to send the stock status to (gets initialized in the ready event)
+let firstRun = true;     // flag to indicate if this is the first run of the bot (used to prevent sending stock status on startup, if configured)
 
 console.log(chalk.cyan("\nWelcome to Adafruit Pi Stock Bot! :)\n"));
 console.log(chalk.blue("Author: " + chalk.cyan("Logan S. ~ EthyMoney (Discord and GitHub)")));
@@ -136,7 +137,7 @@ client.on('ready', () => {
 
 // function to query the Adafruit website for the stock stats of all models of the Raspberry Pi 4 Model B
 
-function checkStockStatus() {
+async function checkStockStatus() {
   // if sleep mode is enabled in config.json, this will only check stock status between 6am to 8pm (CDT) (11am to 1am UTC)
   // the website is only likely to be updated between these times so we don't need to spam Adafruit's servers overnight
   if (config.generalSettings.enableSleepMode) {
@@ -196,53 +197,63 @@ function checkStockStatus() {
   modelsGroupedByPages = newArray;
 
   // for each common page, make one page request and check the status of each of the models on that page
-  modelsGroupedByPages.forEach(pageGroup => {
+  for (const pageGroup of modelsGroupedByPages) {
     // use the URL of the fist model in the group to make the request for checking all models on the page
     const model = pageGroup[0];
-    axios.get(model.url)
-      .then(function (response) {
-        // on successful pull, select the HTML from the response and parse it into a DOM object
-        const html = response.data;
-        const dom = new JSDOM(html);
-
-        // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
-        const stockList = dom.window.document.querySelector('#prod-stock').querySelectorAll('li');
-
-        pageGroup.forEach(model => {
-          // gather the stock status of each model (represented as a boolean for being in-stock or not)
-          // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
-          let modelInStock = stockList[model.commonProductPageCartButtonIndex].textContent.toLowerCase().indexOf('out of stock') === -1;
-
-          // Check new stock statuses against old cached status to see if any models have come in stock that weren't previously
-          // This check will prevent sending another notification for a model that has already had a notification sent for it
-          checkForNewStock(modelInStock, model);
-        });
-
-      }).catch(function (error) {
-        console.error(chalk.red('An error occurred during the status refresh:\n'), error);
-      });
-  });
-
-  // check the ungrouped models (ones that don't have a commonProductPageIdentifier) separately
-  ungroupedModels.forEach(model => {
-    axios.get(model.url)
-      .then(function (response) {
-        // on successful pull, select the HTML from the response and parse it into a DOM object
-        const html = response.data;
-        const dom = new JSDOM(html);
-
-        // Look for the add to cart button
-        let modelInStock = checkForAddToCartButton(dom.window.document);
-
-        // Check new stock status against old cached status to see if any models have come in stock that weren't previously
-        // This check will prevent sending another notification for a model that has already had a notification sent for it
-        checkForNewStock(modelInStock, model);
-
-      }).catch(function (error) {
+    const response = await fetch(model.url)
+      .catch(function (error) {
         console.error(chalk.red('An error occurred during the status refresh:\n'), error);
         console.log("During this error, we were looking at " + model.name + " : " + model.url);
       });
-  });
+
+    if (response.ok) {
+      const html = await response.text();
+      const dom = new JSDOM(html);
+
+      // query the DOM to get all of the HTML list <li> elements that contain the stock status for each model
+      const stockList = dom.window.document.querySelector('#prod-stock').querySelectorAll('li');
+
+      for (const model of pageGroup) {
+        // gather the stock status of each model (represented as a boolean for being in-stock or not)
+        // check if the text doesn't contain the text "Out of Stock" (will be showing the price instead if it's actually in stock
+        let modelInStock = stockList[model.commonProductPageCartButtonIndex].textContent.toLowerCase().indexOf('out of stock') === -1;
+
+        // Check new stock statuses against old cached status to see if any models have come in stock that weren't previously
+        // This check will prevent sending another notification for a model that has already had a notification sent for it
+        checkForNewStock(modelInStock, model);
+      }
+    }
+    else {
+      console.log("Fetch response was not ok for " + model.name + " : " + model.url + " with status code: " + response.status);
+    }
+  }
+
+  // check the ungrouped models (ones that don't have a commonProductPageIdentifier) separately
+  for (const model of ungroupedModels) {
+    const response = await fetch(model.url)
+      .catch(function (error) {
+        console.error(chalk.red('An error occurred during the status refresh:\n'), error);
+        console.log("During this error, we were looking at " + model.name + " : " + model.url);
+      });
+
+    if (response.ok) {
+      const html = await response.text();
+      const dom = new JSDOM(html);
+
+      // Look for the add to cart button
+      let modelInStock = checkForAddToCartButton(dom.window.document);
+
+      // Check new stock status against old cached status to see if any models have come in stock that weren't previously
+      // This check will prevent sending another notification for a model that has already had a notification sent for it
+      checkForNewStock(modelInStock, model);
+    }
+    else {
+      console.log("Fetch response was not ok for " + model.name + " : " + model.url + " with status code: " + response.status);
+    }
+  }
+
+  // disable first run flag so we can send notifications on the next run if needed
+  if (firstRun) firstRun = false;
 
   // send the stock status to discord and/or slack if any stock flags are true (in stock)
   let atLeastOneInStock = false;
@@ -416,7 +427,7 @@ function setupDiscordServer() {
   });
 
   // create the roles in the server if they don't exist yet
-  roles.forEach(role => {
+  for (const role of roles) {
     if (!configuredGuild.roles.cache.find(r => r.name == role.name)) {
       configuredGuild.roles.create({
         name: role.name,
@@ -430,7 +441,7 @@ function setupDiscordServer() {
           console.error(chalk.red(`Error creating role: ${role.name}\n:`), err);
         });
     }
-  });
+  }
   // create the notification channel if an existing one wasn't specified in the config (this will also trigger if configured channel is misspelled or in wrong case in config file)
   if (!configuredGuild.channels.cache.find(c => c.name == config.discord.channelName)) {
     configuredGuild.channels.create({
@@ -508,6 +519,14 @@ function checkForNewStock(stockStatusOnSite, model) {
   else {
     adjustedStatus = false;
   }
+  // if first run and skip startup notifications is enabled, set the active status flag to false so a new notification doesn't get sent 
+  // the already-sent flag was set to true above like normal, we are just skipping the actual initial notification
+  console.log(firstRun, config.generalSettings.skipStartupAlerts)
+  if (firstRun && config.generalSettings.skipStartupAlerts && stockStatusOnSite) {
+    adjustedStatus = false;
+    console.log(chalk.yellow(chalk.cyan(model.name), ': Skipping sending stock status on startup due to config setting!'));
+  }
+
   // update the active status flag for the model
   stockFlags[modelLookupKey] = adjustedStatus;
 }
