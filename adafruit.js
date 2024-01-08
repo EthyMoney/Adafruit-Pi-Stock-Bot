@@ -521,10 +521,9 @@ function checkForNewStock(stockStatusOnSite, model) {
   }
   // if first run and skip startup notifications is enabled, set the active status flag to false so a new notification doesn't get sent 
   // the already-sent flag was set to true above like normal, we are just skipping the actual initial notification
-  console.log(firstRun, config.generalSettings.skipStartupAlerts)
   if (firstRun && config.generalSettings.skipStartupAlerts && stockStatusOnSite) {
     adjustedStatus = false;
-    console.log(chalk.yellow(chalk.cyan(model.name), ': Skipping sending stock status on startup due to config setting!'));
+    console.log(chalk.yellow('In stock: ' + chalk.cyan(model.name), '- Skipping notification send on startup due to config setting!'));
   }
 
   // update the active status flag for the model
