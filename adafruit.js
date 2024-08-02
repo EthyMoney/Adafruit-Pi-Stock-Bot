@@ -39,7 +39,8 @@
 // -------------------------------------------
 
 // import the package json
-import * as packageJson from './package.json' assert { type: "json" };
+// @eslint-disable-next-line
+import * as packageJson from './package.json' with { type: "json" };
 import { Client, GatewayIntentBits, ShardClientUtil, EmbedBuilder, ChannelType, PermissionFlagsBits, Colors } from 'discord.js';
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 import axios from 'axios';
