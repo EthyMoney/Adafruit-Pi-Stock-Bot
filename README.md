@@ -82,17 +82,20 @@ On a set interval, the bot will query Adafruit's product pages for the models yo
 
 * Go to the [Slack App API](https://api.slack.com/) and click "Create an app", then select "From scratch" in the popup that appears.
 * Give your Slack App a name and select your workspace you'd like to add the bot to, then click "Create App".
-* Under the "Add features and functionality" section select the "Bots" option.
 * Along the left side navigation under the "Features" section, select "OAuth & Permissions". Once selected, scroll down to the "Scopes" section.
-* Under "Bot Token Scopes", click the "Add an OAuth Scope" button and then add these scopes:
+* Under "Bot Token Scopes", NOT THE USER TOKEN SCOPES, click the "Add an OAuth Scope" button and then add these scopes:
   * "chat:write",
+  * "chat:write.public",
   * "links:write",
-  * "channels:manage",
+  * "channels:write.topic",
   * "chat:write.customize",
-  * "chat:write.public".
-* Now scroll back up and click the "Install to Workspace" button. Allow the app access to your workspace using the "Allow" button on the screen that appears.
-* You will now be shown a page with your bot token. Copy the "Bot User OAuth Token" and paste it in the `token` field of the slack section in the `config.json`. KEEP THIS TOKEN SAFE AND PRIVATE!
+  * "groups:write",
+  * "reactions:read",
+  * "reactions:write".
+* Now scroll back up and click the "Install to <Workspace Name>" button. Allow the app access to your workspace using the "Allow" button on the screen that appears.
+* You will now be shown a page with your bot token. Copy the "Bot User OAuth Token" (not the "User OAuth Token"), and paste it in the `token` field of the slack section in the `config.json`. KEEP THIS TOKEN SAFE AND PRIVATE! Your token should start with "xoxb" to confirm it is the bot one. A non-bot token will start with "xoxp", which we don't want.
 * Create at least one channel for the bot to post into. Put the name of the channel into the `config.json` in the `channelName` field of the slack section.
+* If your channel is private, you must add the app to it. You can do this by typing "/all" in the message box and you should see a suggestion popup to "Add apps to this channel". Select that and hit "Add" next your app in the list. Your bot will not be able to post to the channel without being added like this. For public channels this isn't needed, it can already post to them.
 
 ### Final Configuration Steps and Bot Startup
 
